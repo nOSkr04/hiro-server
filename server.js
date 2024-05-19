@@ -20,7 +20,6 @@ import notificationsRoutes from "./routes/notifications.js";
 import usersRoutes from "./routes/users.js";
 import errorHandler from "./middleware/error.js";
 import connectDB from "./config/db.js";
-import mediasRoutes from "./routes/media.js";
 
 // Аппын тохиргоог process.env рүү ачаалах
 dotenv.config({ path: "./config/config.env" });
@@ -103,7 +102,6 @@ app.use(morgan("combined", { stream: accessLogStream }));
 app.use("/products", productRoutes);
 app.use("/options", optionRoutes);
 app.use("/users", usersRoutes);
-app.use("/media", mediasRoutes);
 app.use("/wallets", walletsRoutes);
 app.use("/notification", notificationsRoutes);
 // Алдаа үүсэхэд барьж авч алдааны мэдээллийг клиент тал руу автоматаар мэдээлнэ

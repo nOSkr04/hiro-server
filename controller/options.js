@@ -1,11 +1,11 @@
 import path from "path";
 import Option from "../models/Option.js";
-
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
-
+import Product from "../models/Product.js";
+import Variant from "../models/Variant.js";
 // /options
 export const getOptions = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -45,7 +45,46 @@ export const getOption = asyncHandler(async (req, res, next) => {
 });
 
 export const createOption = asyncHandler(async (req, res, next) => {
+  const id = req.params.productId;
+  const values = req.body.values;
+  const product = await Product.findById(id);
+  if (!product) {
+    throw new MyError(id + " ID-тэй бараа байхгүй байна.", 404);
+  }
   const option = await Option.create(req.body);
+  product.set({
+    options: [...product.options, option._id],
+  });
+  await product.save();
+
+  const oldVariants = await Variant.find({ product: id });
+  if (oldVariants.length > 0) {
+    oldVariants.forEach(async (variant) => {
+      await variant.deleteOne();
+    });
+  }
+  const newVariants = [];
+  const getVariants = (arr, n) => {
+    if (n === values.length) {
+      newVariants.push(arr);
+      return;
+    }
+    for (let i = 0; i < values[n].length; i++) {
+      getVariants([...arr, values[n][i]], n + 1);
+    }
+  };
+  getVariants([], 0);
+  newVariants.forEach(async (variant) => {
+    const newVariant = await Variant.create({
+      name: variant.join(", "),
+      product: id,
+      createUser: req.userId,
+    });
+    product.set({
+      variants: [...product.variants, newVariant._id],
+    });
+    await product.save();
+  });
 
   res.status(200).json({
     success: true,

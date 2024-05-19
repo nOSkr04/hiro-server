@@ -9,7 +9,10 @@ const OptionSchema = new mongoose.Schema(
       trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
-
+    product: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product",
+    },
     values: [String],
     createUser: {
       type: mongoose.Schema.ObjectId,

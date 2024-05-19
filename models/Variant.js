@@ -2,19 +2,22 @@ import mongoose from "mongoose";
 
 const VariantSchema = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
       required: [true, "Сонголтын нэр оруулна уу"],
       unique: true,
       trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
-    thumbnail: {
-      url: String,
-      blurHash: String,
-    },
+    images: [
+      {
+        url: String,
+        blurHash: String,
+      },
+    ],
     price: Number,
     quantiy: Number,
+    firstQuantity: Number,
     createUser: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

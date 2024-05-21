@@ -1,11 +1,11 @@
 import path from "path";
-import Option from "../models/Option.js";
+import ProductOption from "../models/ProductOption.js";
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
-import Variant from "../models/Variant.js";
+import Variant from "../models/ProductVariant.js";
 // /options
 export const getOptions = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -15,7 +15,7 @@ export const getOptions = asyncHandler(async (req, res, next) => {
   [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
   const pagination = await paginate(page, limit, Option);
 
-  const options = await Option.find(req.query)
+  const options = await ProductOption.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
     .limit(limit);
@@ -29,7 +29,7 @@ export const getOptions = asyncHandler(async (req, res, next) => {
 });
 
 export const getOption = asyncHandler(async (req, res, next) => {
-  const option = await Option.findById(req.params.id);
+  const option = await ProductOption.findById(req.params.id);
 
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
@@ -63,7 +63,7 @@ export const createOption = asyncHandler(async (req, res, next) => {
       await variant.deleteOne();
     });
   }
-  const options = Option.find({ product: req.body.productId }).populate([
+  const options = ProductOption.find({ product: req.body.productId }).populate([
     {
       model: "Product",
       path: "product",
@@ -99,6 +99,7 @@ export const createOption = asyncHandler(async (req, res, next) => {
       name: val.join("/"),
       price: product.price,
       product: product,
+      type: "DEFAULT",
     }).save();
   });
 
@@ -109,7 +110,7 @@ export const createOption = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteOption = asyncHandler(async (req, res, next) => {
-  const option = await Option.findById(req.params.id);
+  const option = await ProductOption.findById(req.params.id);
 
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
@@ -123,7 +124,7 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 
   option.remove();
 
-  const options = await Option.find({parentId: req.params.parentId});
+  const options = await ProductOption.find({parentId: req.params.parentId});
   //check options values
   options
   res.status(200).json({
@@ -134,7 +135,7 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 });
 
 export const updateOption = asyncHandler(async (req, res, next) => {
-  const option = await Option.findById(req.params.id);
+  const option = await ProductOption.findById(req.params.id);
 
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);

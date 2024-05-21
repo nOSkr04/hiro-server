@@ -1,19 +1,23 @@
 import mongoose from "mongoose";
 
-const OptionSchema = new mongoose.Schema(
+const ProductOptionSchema = new mongoose.Schema(
   {
-    label: {
+    name: {
       type: String,
       required: [true, "Сонголтын нэр оруулна уу"],
       unique: true,
       trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
+    values: [String],
+    images: {
+      type: mongoose.Schema.ObjectId,
+      ref : "Image"
+    },
     product: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",
     },
-    values: [String],
     createUser: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -31,4 +35,4 @@ const OptionSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export default mongoose.model("Option", OptionSchema);
+export default mongoose.model("ProductOption", ProductOptionSchema);

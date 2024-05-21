@@ -16,6 +16,11 @@ const ProductSchema = new mongoose.Schema(
       url: String,
       blurHash: String,
     },
+    type: {
+      type: String,
+      enum: ["NEW", "ACTIVE", "DRAFT","ARCHIVED"],
+      default: "NEW",
+    },
     images: [
       {
         url: String,

@@ -1,13 +1,17 @@
 import mongoose from "mongoose";
 
-const VariantSchema = new mongoose.Schema(
+const ProductVariantSchema = new mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
       required: [true, "Сонголтын нэр оруулна уу"],
       unique: true,
       trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
+    },
+    type: {
+      type: String,
+      enum: ["DEFAULT","MANUAL"]
     },
     images: [
       {
@@ -15,6 +19,10 @@ const VariantSchema = new mongoose.Schema(
         blurHash: String,
       },
     ],
+    availableForSale: {
+      type: Boolean,
+      default: false
+    },
     price: Number,
     quantiy: Number,
     firstQuantity: Number,
@@ -35,4 +43,4 @@ const VariantSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export default mongoose.model("Variant", VariantSchema);
+export default mongoose.model("ProductVariant", ProductVariantSchema);

@@ -3,7 +3,7 @@ const router = Router();
 import { protect, authorize } from "../middleware/protect.js";
 
 import {
-  allUserNotification,
+  // allUserNotification,
   createNotification,
   deleteNotification,
   getNotification,
@@ -14,7 +14,7 @@ router
   .route("/")
   .get(protect, getNotification)
   .post(protect, createNotification);
-router.route("/all").post(protect, allUserNotification);
+// router.route("/all").post(protect, allUserNotification);
 router.route("/:id").delete(protect, authorize("admin"), deleteNotification);
 
 export default router;

@@ -1,7 +1,6 @@
 import Notification from "../models/Notification.js";
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
-import sendAllUserNotification from "../utils/sendAllUserNotification.js";
 import User from "../models/User.js";
 import paginate from "../utils/paginate.js";
 
@@ -85,34 +84,34 @@ export const deleteNotification = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const allUserNotification = asyncHandler(async (req, res, next) => {
-  const users = await User.find().lean();
-  const { data, body, title } = req.body;
+// export const allUserNotification = asyncHandler(async (req, res, next) => {
+//   const users = await User.find().lean();
+//   const { data, body, title } = req.body;
 
-  const uniqueIdsSet = new Set();
+//   const uniqueIdsSet = new Set();
 
-  const uniqueData = users.filter((item) => {
-    const id = item.expoPushToken;
-    if (!uniqueIdsSet.has(id)) {
-      uniqueIdsSet.add(id);
-      return true;
-    }
-    return false;
-  });
+//   const uniqueData = users.filter((item) => {
+//     const id = item.expoPushToken;
+//     if (!uniqueIdsSet.has(id)) {
+//       uniqueIdsSet.add(id);
+//       return true;
+//     }
+//     return false;
+//   });
 
-  uniqueData.map(async (user) => {
-    const { expoPushToken, _id } = user;
-    if (expoPushToken) {
-      await sendAllUserNotification(expoPushToken, data, title, body);
-      await Notification.create({
-        title,
-        users: _id, // Link the notification to the user
-      });
-      await User.updateOne({ _id: _id }, { $inc: { notificationCount: 1 } });
-    }
-  });
-  res.status(200).json({
-    success: true,
-    data: "success",
-  });
-});
+//   uniqueData.map(async (user) => {
+//     const { expoPushToken, _id } = user;
+//     if (expoPushToken) {
+//       await sendAllUserNotification(expoPushToken, data, title, body);
+//       await Notification.create({
+//         title,
+//         users: _id, // Link the notification to the user
+//       });
+//       await User.updateOne({ _id: _id }, { $inc: { notificationCount: 1 } });
+//     }
+//   });
+//   res.status(200).json({
+//     success: true,
+//     data: "success",
+//   });
+// });

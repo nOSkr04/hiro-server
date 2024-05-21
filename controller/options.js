@@ -53,7 +53,7 @@ export const createOption = asyncHandler(async (req, res, next) => {
   }
   const option = await Option.create(req.body);
   product.set({
-    options: [...product.options, option._id],
+    options: [...(product.options || []), option._id],
   });
   await product.save();
 
@@ -63,27 +63,43 @@ export const createOption = asyncHandler(async (req, res, next) => {
       await variant.deleteOne();
     });
   }
-  const newVariants = [];
-  const getVariants = (arr, n) => {
-    if (n === values.length) {
-      newVariants.push(arr);
-      return;
+  const options = Option.find({ product: req.body.productId }).populate([
+    {
+      model: "Product",
+      path: "product",
+    },
+    {
+      model: "Variant",
+      path: "variant",
+    },
+  ]);
+  const mappedOptions = options.map((item) => item.values);
+
+  function generateCombinations(arrays, prefix = []) {
+    if (arrays.length === 0) {
+      return [prefix];
+    } else {
+      let result = [];
+      const firstArray = arrays[0];
+      const remainingArrays = arrays.slice(1);
+      for (let value of firstArray) {
+        result = result.concat(
+          generateCombinations(remainingArrays, prefix.concat(value))
+        );
+      }
+      return result;
     }
-    for (let i = 0; i < values[n].length; i++) {
-      getVariants([...arr, values[n][i]], n + 1);
-    }
-  };
-  getVariants([], 0);
-  newVariants.forEach(async (variant) => {
-    const newVariant = await Variant.create({
-      name: variant.join(", "),
-      product: id,
-      createUser: req.userId,
-    });
-    product.set({
-      variants: [...product.variants, newVariant._id],
-    });
-    await product.save();
+  }
+
+  const nestedValues = mappedOptions.map((item) => item.values);
+
+  const combinations = generateCombinations(nestedValues);
+  combinations.map(async (val) => {
+    await new Variant({
+      name: val.join("/"),
+      price: product.price,
+      product: product,
+    }).save();
   });
 
   res.status(200).json({
@@ -107,6 +123,9 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 
   option.remove();
 
+  const options = await Option.find({parentId: req.params.parentId});
+  //check options values
+  options
   res.status(200).json({
     success: true,
     data: option,

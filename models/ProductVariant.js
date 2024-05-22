@@ -11,7 +11,7 @@ const ProductVariantSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["DEFAULT","MANUAL"]
+      enum: ["DEFAULT", "MANUAL"],
     },
     images: [
       {
@@ -21,7 +21,7 @@ const ProductVariantSchema = new mongoose.Schema(
     ],
     availableForSale: {
       type: Boolean,
-      default: false
+      default: false,
     },
     price: Number,
     quantiy: Number,

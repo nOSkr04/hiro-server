@@ -12,7 +12,7 @@ const ProductOptionSchema = new mongoose.Schema(
     values: [String],
     images: {
       type: mongoose.Schema.ObjectId,
-      ref : "Image"
+      ref: "Image",
     },
     product: {
       type: mongoose.Schema.ObjectId,

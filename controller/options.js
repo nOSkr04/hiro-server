@@ -7,6 +7,22 @@ import User from "../models/User.js";
 import Product from "../models/Product.js";
 import Variant from "../models/ProductVariant.js";
 // /options
+function generateCombinations(arrays, prefix = []) {
+  if (arrays.length === 0) {
+    return [prefix];
+  } else {
+    let result = [];
+    const firstArray = arrays[0];
+    const remainingArrays = arrays.slice(1);
+    for (let value of firstArray) {
+      result = result.concat(
+        generateCombinations(remainingArrays, prefix.concat(value))
+      );
+    }
+    return result;
+  }
+}
+
 export const getOptions = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
@@ -45,7 +61,7 @@ export const getOption = asyncHandler(async (req, res, next) => {
 });
 
 export const createOption = asyncHandler(async (req, res, next) => {
-  const id = req.params.productId;
+  const id = req.body.productId;
   const values = req.body.values;
   const product = await Product.findById(id);
   if (!product) {
@@ -73,25 +89,7 @@ export const createOption = asyncHandler(async (req, res, next) => {
       path: "variant",
     },
   ]);
-  const mappedOptions = options.map((item) => item.values);
-
-  function generateCombinations(arrays, prefix = []) {
-    if (arrays.length === 0) {
-      return [prefix];
-    } else {
-      let result = [];
-      const firstArray = arrays[0];
-      const remainingArrays = arrays.slice(1);
-      for (let value of firstArray) {
-        result = result.concat(
-          generateCombinations(remainingArrays, prefix.concat(value))
-        );
-      }
-      return result;
-    }
-  }
-
-  const nestedValues = mappedOptions.map((item) => item.values);
+  const nestedValues = options.map((item) => item.values);
 
   const combinations = generateCombinations(nestedValues);
   combinations.map(async (val) => {
@@ -124,9 +122,9 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 
   option.remove();
 
-  const options = await ProductOption.find({parentId: req.params.parentId});
+  const options = await ProductOption.find({ parentId: req.params.parentId });
   //check options values
-  options
+  options;
   res.status(200).json({
     success: true,
     data: option,

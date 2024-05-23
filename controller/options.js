@@ -5,7 +5,7 @@ import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
-import Variant from "../models/ProductVariant.js";
+import ProductVariant from "../models/ProductVariant.js";
 // /options
 function generateCombinations(arrays, prefix = []) {
   if (arrays.length === 0) {
@@ -61,46 +61,55 @@ export const getOption = asyncHandler(async (req, res, next) => {
 });
 
 export const createOption = asyncHandler(async (req, res, next) => {
-  const id = req.body.productId;
-  const values = req.body.values;
+  const id = req.body.product;
   const product = await Product.findById(id);
   if (!product) {
     throw new MyError(id + " ID-тэй бараа байхгүй байна.", 404);
   }
-  const option = await Option.create(req.body);
+  const option = await ProductOption.create(req.body);
   product.set({
     options: [...(product.options || []), option._id],
   });
   await product.save();
 
-  const oldVariants = await Variant.find({ product: id });
+  const oldVariants = await ProductVariant.find({
+    product: id,
+    type: "DEFAULT",
+  });
   if (oldVariants.length > 0) {
     oldVariants.forEach(async (variant) => {
       await variant.deleteOne();
     });
   }
-  const options = ProductOption.find({ product: req.body.productId }).populate([
-    {
-      model: "Product",
-      path: "product",
-    },
-    {
-      model: "Variant",
-      path: "variant",
-    },
-  ]);
+  const options = await ProductOption.find({ product: id });
+  if (!options) {
+    throw new MyError(id + " ID-тэй барааны сонголт байхгүй байна.", 404);
+  }
   const nestedValues = options.map((item) => item.values);
-
+  if (!nestedValues) {
+    throw new MyError(id + " ID-тэй барааны сонголт байхгүй байна.", 404);
+  }
   const combinations = generateCombinations(nestedValues);
-  combinations.map(async (val) => {
-    await new Variant({
-      name: val.join("/"),
-      price: product.price,
-      product: product,
-      type: "DEFAULT",
-    }).save();
-  });
-
+  let variants = [];
+  try {
+    combinations.map((val) => {
+      const data = new ProductVariant({
+        name: val.length > 1 ? val.join("/") : val[0],
+        price: product.price ? product.price : 0,
+        product: product,
+        type: "DEFAULT",
+        createUser: req.userId,
+      });
+      variants.push(data);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  if (variants.length > 0) {
+    variants.map(async (val) => {
+      await val.save();
+    });
+  }
   res.status(200).json({
     success: true,
     data: option,
@@ -108,7 +117,10 @@ export const createOption = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteOption = asyncHandler(async (req, res, next) => {
-  const option = await ProductOption.findById(req.params.id);
+  const option = await ProductOption.findById(req.params.id).populate({
+    model: "Product",
+    path: "product",
+  });
 
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
@@ -119,12 +131,55 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findById(req.userId);
+  const productId = option.product._id;
 
+  const product = await Product.findById(productId);
+  product.options = product.options.filter(
+    (id) => id.toString() !== req.params.id
+  );
+  await product.save();
   option.remove();
 
-  const options = await ProductOption.find({ parentId: req.params.parentId });
-  //check options values
-  options;
+  const oldVariants = await ProductVariant.find({
+    product: productId,
+    type: "DEFAULT",
+  });
+  if (oldVariants.length > 0) {
+    oldVariants.forEach(async (variant) => {
+      await variant.deleteOne();
+    });
+  }
+
+  const options = await ProductOption.find({ product: productId.toString() }).populate([
+    {
+      model: "Product",
+      path: "product",
+    },
+  ]);
+  try {
+    const nestedValues = options.map((item) => item.values);
+    const combinations = generateCombinations(nestedValues);
+    let variants = [];
+    combinations.map((val) => {
+      const data = new ProductVariant({
+        name: val.length > 1 ? val.join("/") : val[0],
+        price: product.price ? product.price : 0,
+        product: product,
+        type: "DEFAULT",
+        createUser: req.userId,
+      });
+      variants.push(data);
+    });
+
+    if (variants.length > 0) {
+      variants.map(async (val) => {
+        await val.save();
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
   res.status(200).json({
     success: true,
     data: option,
@@ -133,24 +188,74 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 });
 
 export const updateOption = asyncHandler(async (req, res, next) => {
-  const option = await ProductOption.findById(req.params.id);
-
+  const option = await ProductOption.findById(req.params.id)
+    .populate({
+      model: "Product",
+      path: "product",
+    });
+  const countValue = option.values.length;
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
+  // if (option.createUser.toString() !== req.userId && req.userRole !== "admin") {
+  //   throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
+  // }
 
-  if (option.createUser.toString() !== req.userId && req.userRole !== "admin") {
-    throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
-  }
-
-  req.body.updateUser = req.userId;
+  // req.body.updateUser = req.userId;
 
   for (let attr in req.body) {
     option[attr] = req.body[attr];
   }
 
-  option.save();
+  await option.save();
 
+  if (countValue !== req.body.values.length) {
+    const product = await Product.findById(option.product);
+    if( !product ) {
+      throw new MyError(option.product + " ID-тэй бараа байхгүй байна.", 404);
+    }
+
+    const oldVariants = await ProductVariant.find({
+      product: option.product,
+      type: "DEFAULT",
+    });
+    if (oldVariants.length > 0) {
+      oldVariants.forEach(async (variant) => {
+        await variant.deleteOne();
+      });
+    }
+    const options = await ProductOption.find({ product: option.product._id.toString() }).populate([
+      {
+        model: "Product",
+        path: "product",
+      },
+    ]);
+    const nestedValues = options.map((item) => item.values);
+    try {
+      const combinations = generateCombinations(nestedValues);
+      let variants = [];
+      combinations.map((val) => {
+        const data = new ProductVariant({
+          name: val.length > 1 ? val.join("/") : val[0],
+          price: product.price ? product.price : 0,
+          product: product,
+          type: "DEFAULT",
+          createUser: req.userId,
+        });
+        variants.push(data);
+      });
+
+    if (variants.length > 0) {
+      variants.map(async (val) => {
+        await val.save();
+      });
+    }
+
+    } catch (error) {
+      console.log(error);
+      throw new MyError("Алдаа гарлаа. Дахин оролдоно уу.", 400);
+    }
+  }
   res.status(200).json({
     success: true,
     data: option,

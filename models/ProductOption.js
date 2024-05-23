@@ -5,8 +5,8 @@ const ProductOptionSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Сонголтын нэр оруулна уу"],
-      unique: true,
-      trim: true,
+      // unique: true,
+      // trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
     values: [String],

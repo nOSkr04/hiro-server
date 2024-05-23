@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ProductVariantSchema = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
       required: [true, "Сонголтын нэр оруулна уу"],
       unique: true,
@@ -26,6 +26,10 @@ const ProductVariantSchema = new mongoose.Schema(
     price: Number,
     quantiy: Number,
     firstQuantity: Number,
+    product: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product",
+    },
     createUser: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -34,7 +38,6 @@ const ProductVariantSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-
     createdAt: {
       type: Date,
       default: Date.now,

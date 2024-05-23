@@ -18,6 +18,7 @@ import optionRoutes from "./routes/options.js";
 import walletsRoutes from "./routes/wallets.js";
 import notificationsRoutes from "./routes/notifications.js";
 import usersRoutes from "./routes/users.js";
+import imagesRoutes from "./routes/image.js";
 import errorHandler from "./middleware/error.js";
 import connectDB from "./config/db.js";
 
@@ -104,6 +105,7 @@ app.use("/options", optionRoutes);
 app.use("/users", usersRoutes);
 app.use("/wallets", walletsRoutes);
 app.use("/notification", notificationsRoutes);
+app.use("/images", imagesRoutes);
 // Алдаа үүсэхэд барьж авч алдааны мэдээллийг клиент тал руу автоматаар мэдээлнэ
 app.use(errorHandler);
 

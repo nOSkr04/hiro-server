@@ -4,6 +4,7 @@ import path from "path";
 import rfs from "rotating-file-stream";
 import morgan from "morgan";
 import logger from "./middleware/logger.js";
+import fileupload from "express-fileupload";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
@@ -66,7 +67,7 @@ var corsOptions = {
 };
 
 // index.html-ийг public хавтас дотроос ол гэсэн тохиргоо
-app.use(express.static(new URL("public", import.meta.url).pathname));
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // Express rate limit : Дуудалтын тоог хязгаарлана
 const limiter = rateLimit({
@@ -91,7 +92,7 @@ app.use(helmet());
 // app.use(xss());
 // Клиент сайтаас дамжуулж буй MongoDB өгөгдлүүдийг халдлагаас цэвэрлэнэ
 app.use(mongoSanitize());
-
+app.use(fileupload());
 // Morgan logger-ийн тохиргоо
 var accessLogStream = rfs.createStream("access.log", {
   interval: "1d", // rotate daily

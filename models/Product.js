@@ -44,6 +44,11 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Барааны тайлбарыг оруулна уу"],
     },
     price: Number,
+    discount: Number,
+    category: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Category",
+    },
     seen: {
       type: Number,
       default: 0,

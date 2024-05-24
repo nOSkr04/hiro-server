@@ -14,6 +14,8 @@ import rateLimit from "express-rate-limit";
 import hpp from "hpp";
 import color from "colors";
 // Router оруулж ирэх
+import bannerRoutes from "./routes/banner.js";
+import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/products.js";
 import optionRoutes from "./routes/options.js";
 import walletsRoutes from "./routes/wallets.js";
@@ -22,7 +24,6 @@ import usersRoutes from "./routes/users.js";
 import imagesRoutes from "./routes/image.js";
 import errorHandler from "./middleware/error.js";
 import connectDB from "./config/db.js";
-
 // Аппын тохиргоог process.env рүү ачаалах
 dotenv.config({ path: "./config/config.env" });
 
@@ -101,12 +102,14 @@ var accessLogStream = rfs.createStream("access.log", {
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // REST API RESOURSE
+app.use("/banners", bannerRoutes);
 app.use("/products", productRoutes);
 app.use("/options", optionRoutes);
 app.use("/users", usersRoutes);
 app.use("/wallets", walletsRoutes);
 app.use("/notification", notificationsRoutes);
 app.use("/images", imagesRoutes);
+app.use("/categories", categoryRoutes);
 // Алдаа үүсэхэд барьж авч алдааны мэдээллийг клиент тал руу автоматаар мэдээлнэ
 app.use(errorHandler);
 

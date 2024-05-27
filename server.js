@@ -19,9 +19,11 @@ import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/products.js";
 import optionRoutes from "./routes/options.js";
 import walletsRoutes from "./routes/wallets.js";
+import cardsRoutes from "./routes/card.js";
 import notificationsRoutes from "./routes/notifications.js";
 import usersRoutes from "./routes/users.js";
 import imagesRoutes from "./routes/image.js";
+import variantsRoutes from "./routes/variant.js";
 import errorHandler from "./middleware/error.js";
 import connectDB from "./config/db.js";
 // Аппын тохиргоог process.env рүү ачаалах
@@ -102,6 +104,8 @@ var accessLogStream = rfs.createStream("access.log", {
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // REST API RESOURSE
+app.use("/cards", cardsRoutes);
+app.use("/variants", variantsRoutes);
 app.use("/banners", bannerRoutes);
 app.use("/products", productRoutes);
 app.use("/options", optionRoutes);

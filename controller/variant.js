@@ -15,17 +15,17 @@ export const getVariants = asyncHandler(async (req, res, next) => {
   const sort = req.query.sort;
 
   [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
-  const pagination = await paginate(page, limit, Option);
+  const pagination = await paginate(page, limit, ProductVariant);
 
-  const options = await ProductVariant.find(req.query)
+  const variants = await ProductVariant.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
     .limit(limit);
 
   res.status(200).json({
     success: true,
-    count: options.length,
-    data: options,
+    count: variants.length,
+    data: variants,
     pagination,
   });
 });
@@ -98,38 +98,38 @@ export const deleteVariant = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findById(req.userId);
-
-  const options = await ProductOption.find({ parentId: req.params.parentId });
-  //check options values
-  options;
+  await variant.remove();
   res.status(200).json({
     success: true,
-    data: option,
+    data: variant,
     whoDeleted: user.name,
   });
 });
 
-export const updateOption = asyncHandler(async (req, res, next) => {
-  const option = await ProductOption.findById(req.params.id);
+export const updateVariant = asyncHandler(async (req, res, next) => {
+  const variant = await ProductVariant.findById(req.params.id);
 
-  if (!option) {
+  if (!variant) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
 
-  if (option.createUser.toString() !== req.userId && req.userRole !== "admin") {
+  if (
+    variant.createUser.toString() !== req.userId &&
+    req.userRole !== "admin"
+  ) {
     throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
   }
 
   req.body.updateUser = req.userId;
 
   for (let attr in req.body) {
-    option[attr] = req.body[attr];
+    variant[attr] = req.body[attr];
   }
 
-  option.save();
+  await variant.save();
 
   res.status(200).json({
     success: true,
-    data: option,
+    data: variant,
   });
 });

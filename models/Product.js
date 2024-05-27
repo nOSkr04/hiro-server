@@ -18,7 +18,7 @@ const ProductSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["NEW", "ACTIVE", "DRAFT","ARCHIVED"],
+      enum: ["NEW", "ACTIVE", "DRAFT", "ARCHIVED"],
       default: "NEW",
     },
     images: [
@@ -31,12 +31,6 @@ const ProductSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.ObjectId,
         ref: "Option",
-      },
-    ],
-    variants: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "Variant",
       },
     ],
     description: {

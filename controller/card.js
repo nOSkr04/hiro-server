@@ -2,11 +2,12 @@ import Banner from "../models/Banner.js";
 
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
-import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
+import Card from "../models/Card.js";
+import paginate from "../utils/paginate.js";
 
-// /products
-export const getBanners = asyncHandler(async (req, res, next) => {
+// card
+export const getCards = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const sort = req.query.sort;
@@ -14,45 +15,50 @@ export const getBanners = asyncHandler(async (req, res, next) => {
   [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
   const pagination = await paginate(page, limit, Banner);
 
-  const banner = await Banner.find(req.query)
+  const cards = await Card.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
     .limit(limit);
 
   res.status(200).json({
     success: true,
-    count: banner.length,
-    data: banner,
+    count: cards.length,
+    data: cards,
     pagination,
   });
 });
 
-export const getBanner = asyncHandler(async (req, res, next) => {
-  const banner = await Banner.findById(req.params.id);
-
-  if (!banner) {
-    throw new MyError(req.params.id + " ID-тэй баннэр байхгүй байна.", 404);
-  }
+export const getCard = asyncHandler(async (req, res, next) => {
+  const card = await Card.findById(req.params.id);
 
   res.status(200).json({
     success: true,
-    data: product,
+    data: card,
   });
 });
 
-export const createBanner = asyncHandler(async (req, res, next) => {
-  const banner = await Banner.create(req.body);
+export const getOwnCard = asyncHandler(async (req, res, next) => {
+  const card = await Card.findById(req.userId);
 
   res.status(200).json({
     success: true,
-    data: banner,
+    data: card,
   });
 });
 
-export const deleteBanner = asyncHandler(async (req, res, next) => {
-  const banner = await Banner.findById(req.params.id);
+export const createCard = asyncHandler(async (req, res, next) => {
+  const card = await Card.create(req.body);
 
-  if (!banner) {
+  res.status(200).json({
+    success: true,
+    data: card,
+  });
+});
+
+export const deleteCard = asyncHandler(async (req, res, next) => {
+  const card = await Card.findById(req.params.id);
+
+  if (!card) {
     throw new MyError(req.params.id + " ID-тэй байхгүй байна.", 404);
   }
 
@@ -62,36 +68,36 @@ export const deleteBanner = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(req.userId);
 
-  banner.remove();
+  card.remove();
 
   res.status(200).json({
     success: true,
-    data: banner,
+    data: card,
     whoDeleted: user.name,
   });
 });
 
-export const updateBanner = asyncHandler(async (req, res, next) => {
-  const banner = await Banner.findById(req.params.id);
+export const updateCard = asyncHandler(async (req, res, next) => {
+  const card = await Card.findById(req.params.id);
 
-  if (!banner) {
+  if (!card) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
 
-  if (banner.createUser.toString() !== req.userId && req.userRole !== "admin") {
+  if (card.createUser.toString() !== req.userId && req.userRole !== "admin") {
     throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
   }
 
   req.body.updateUser = req.userId;
 
   for (let attr in req.body) {
-    banner[attr] = req.body[attr];
+    card[attr] = req.body[attr];
   }
 
-  banner.save();
+  card.save();
 
   res.status(200).json({
     success: true,
-    data: banner,
+    data: card,
   });
 });

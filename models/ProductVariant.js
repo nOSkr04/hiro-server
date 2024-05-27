@@ -24,7 +24,7 @@ const ProductVariantSchema = new mongoose.Schema(
       default: false,
     },
     price: Number,
-    quantiy: Number,
+    quantity: Number,
     firstQuantity: Number,
     product: {
       type: mongoose.Schema.ObjectId,

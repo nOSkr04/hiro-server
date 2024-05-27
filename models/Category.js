@@ -21,6 +21,12 @@ const CategorySchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "Category",
     },
+    childCategories: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Category",
+      },
+    ],
     createUser: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

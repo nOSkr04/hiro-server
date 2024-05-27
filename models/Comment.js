@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
 
-const CardSchema = new mongoose.Schema(
+const CommentSchema = new mongoose.Schema(
   {
-    productVariant: {
+    product: {
       type: mongoose.Schema.ObjectId,
-      ref: "ProductVariant",
+      ref: "Product",
     },
-    quantity: Number,
-    price: Number,
-    totalPrice: Number,
-    type: String, // NEW, PENDING, DONE, DRAFT, ARCHIVED
+    text: String,
+    images: [{
+      type: mongoose.Schema.ObjectId,
+      ref: "Image",
+    }],
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -26,4 +27,4 @@ const CardSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export default mongoose.model("Card", CardSchema);
+export default mongoose.model("Comment", CommentSchema);

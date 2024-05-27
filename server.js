@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 import hpp from "hpp";
 import color from "colors";
 // Router оруулж ирэх
+import commentRoutes from './routes/comment.js';
 import bannerRoutes from "./routes/banner.js";
 import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/products.js";
@@ -104,6 +105,7 @@ var accessLogStream = rfs.createStream("access.log", {
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // REST API RESOURSE
+app.use("/comments", commentRoutes);
 app.use("/cards", cardsRoutes);
 app.use("/variants", variantsRoutes);
 app.use("/banners", bannerRoutes);

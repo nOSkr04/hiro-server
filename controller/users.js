@@ -132,24 +132,33 @@ export const logout = asyncHandler(async (req, res, next) => {
 });
 
 export const getUsers = asyncHandler(async (req, res, next) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const sort = req.query.sort;
-  const select = req.query.select;
+  const filters = {};
+  const page = parseInt(req.query.page, 10) - 1 || 0;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const filter = req.query.filter || {};
 
-  ["select", "sort", "page", "limit"].forEach((el) => delete req.query[el]);
+  if (filter?.select && filter?.select !== "") {
+    filters.$or = [
+      {
+        username: { $regex: `${filter?.select}`, $options: "i" },
+      },
+      {
+        role: { $regex: `${filter?.select}`, $options: "i" },
+      },
+    ];
+  }
+  console.log("filters", filters)
 
-  const pagination = await paginate(page, limit, User);
-
-  const users = await User.find(req.query, select)
-    .sort(sort)
-    .skip(pagination.start - 1)
-    .limit(limit);
+  const countUser = await User.countDocuments(filters);
+  const users = await User.find(filters)
+    .sort({ createdAt: -1 })
+    .skip(page * limit)
+    .limit(limit)
 
   res.status(200).json({
     success: true,
     data: users,
-    pagination,
+    count: countUser,
   });
 });
 

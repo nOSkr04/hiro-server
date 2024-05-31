@@ -28,15 +28,11 @@ export const getCategory = asyncHandler(async (req, res, next) => {
 });
 
 export const getCategories = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id);
-
-  if (!category) {
-    throw new MyError(req.params.id + " ID-тэй категори байхгүй байна.", 404);
-  }
+  const category = await Category.find();
 
   res.status(200).json({
     success: true,
-    data: product,
+    data: category,
   });
 });
 

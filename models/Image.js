@@ -6,6 +6,12 @@ const ImageSchema = new mongoose.Schema(
       type: String,
     },
     blurHash: String,
+    name: String,
+    type: String,
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

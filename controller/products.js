@@ -5,6 +5,8 @@ import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
+import ProductVariant from "../models/ProductVariant.js";
+import ProductOption from "../models/ProductOption.js";
 
 // /products
 export const getProducts = asyncHandler(async (req, res, next) => {
@@ -29,18 +31,34 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 });
 
 export const getProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id)
+  .populate([{
+    model: "Category",
+    path: "category",
+  }, {
+    model: "User",
+    path: "createUser",
+  },
+  {
+    model: "Image",
+    path: "thumbnail",
+  }, {
+    model: "Image",
+    path: "images",
+  }]);
 
   if (!product) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
   }
-
+  const variants = await ProductVariant.find({ product: req.params.id });
   product.seen += 1;
   product.save();
 
+  const productObj = product.toObject();
+
   res.status(200).json({
     success: true,
-    data: product,
+    data: { ...productObj, variants },
   });
 });
 
@@ -54,25 +72,39 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  try {
+    const product = await Product.findById(req.params.id);
 
-  if (!product) {
-    throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
+    if (!product) {
+      throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
+    }
+
+    if (req.userRole !== "admin") {
+      throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
+    }
+
+    const user = await User.findById(req.userId);
+
+    const options = await ProductOption.find({ product: req.params.id });
+    if (options.length > 0) {
+      await ProductOption.deleteMany({ product: req.params.id });
+    }
+
+    const variants = await ProductVariant.find({ product: req.params.id });
+    if (variants.length > 0) {
+      await ProductVariant.deleteMany({ product: req.params.id });
+    }
+
+    await product.remove();
+
+    res.status(200).json({
+      success: true,
+      data: product,
+      whoDeleted: user.name,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  if (req.userRole !== "admin") {
-    throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
-  }
-
-  const user = await User.findById(req.userId);
-
-  product.remove();
-
-  res.status(200).json({
-    success: true,
-    data: product,
-    whoDeleted: user.name,
-  });
 });
 
 export const updateProduct = asyncHandler(async (req, res, next) => {

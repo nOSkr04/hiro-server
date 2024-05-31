@@ -78,10 +78,7 @@ export const updateBanner = asyncHandler(async (req, res, next) => {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
 
-  if (
-    banner.createUser.toString() !== req.userId &&
-    req.userRole !== "admin"
-  ) {
+  if (banner.createUser.toString() !== req.userId && req.userRole !== "admin") {
     throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
   }
 

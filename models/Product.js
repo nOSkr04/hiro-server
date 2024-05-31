@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -13,30 +14,24 @@ const ProductSchema = new mongoose.Schema(
       ],
     },
     thumbnail: {
-      url: String,
-      blurHash: String,
+      type: mongoose.Schema.ObjectId,
+      ref: "Image",
     },
     type: {
       type: String,
-      enum: ["NEW", "ACTIVE", "DRAFT","ARCHIVED"],
+      enum: ["NEW", "ACTIVE", "DRAFT", "ARCHIVED"],
       default: "NEW",
     },
     images: [
       {
-        url: String,
-        blurHash: String,
-      },
+        type: mongoose.Schema.ObjectId,
+        ref: "Image",
+      }
     ],
     options: [
       {
         type: mongoose.Schema.ObjectId,
         ref: "Option",
-      },
-    ],
-    variants: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "Variant",
       },
     ],
     description: {

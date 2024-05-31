@@ -150,7 +150,9 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
     });
   }
 
-  const options = await ProductOption.find({ product: productId.toString() }).populate([
+  const options = await ProductOption.find({
+    product: productId.toString(),
+  }).populate([
     {
       model: "Product",
       path: "product",
@@ -188,11 +190,10 @@ export const deleteOption = asyncHandler(async (req, res, next) => {
 });
 
 export const updateOption = asyncHandler(async (req, res, next) => {
-  const option = await ProductOption.findById(req.params.id)
-    .populate({
-      model: "Product",
-      path: "product",
-    });
+  const option = await ProductOption.findById(req.params.id).populate({
+    model: "Product",
+    path: "product",
+  });
   const countValue = option.values.length;
   if (!option) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
@@ -211,7 +212,7 @@ export const updateOption = asyncHandler(async (req, res, next) => {
 
   if (countValue !== req.body.values.length) {
     const product = await Product.findById(option.product);
-    if( !product ) {
+    if (!product) {
       throw new MyError(option.product + " ID-тэй бараа байхгүй байна.", 404);
     }
 
@@ -224,7 +225,9 @@ export const updateOption = asyncHandler(async (req, res, next) => {
         await variant.deleteOne();
       });
     }
-    const options = await ProductOption.find({ product: option.product._id.toString() }).populate([
+    const options = await ProductOption.find({
+      product: option.product._id.toString(),
+    }).populate([
       {
         model: "Product",
         path: "product",
@@ -245,12 +248,11 @@ export const updateOption = asyncHandler(async (req, res, next) => {
         variants.push(data);
       });
 
-    if (variants.length > 0) {
-      variants.map(async (val) => {
-        await val.save();
-      });
-    }
-
+      if (variants.length > 0) {
+        variants.map(async (val) => {
+          await val.save();
+        });
+      }
     } catch (error) {
       console.log(error);
       throw new MyError("Алдаа гарлаа. Дахин оролдоно уу.", 400);

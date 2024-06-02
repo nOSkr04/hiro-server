@@ -20,7 +20,21 @@ export const getProducts = asyncHandler(async (req, res, next) => {
   const products = await Product.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
-    .limit(limit);
+    .limit(limit)
+    .populate([
+      {
+        model: "User",
+        path: "createUser",
+      },
+      {
+        model: "Image",
+        path: "thumbnail",
+      },
+      {
+        model: "Image",
+        path: "images",
+      },
+    ]);
 
   res.status(200).json({
     success: true,

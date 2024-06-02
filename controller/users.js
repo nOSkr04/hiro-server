@@ -81,16 +81,16 @@ export const register = asyncHandler(async (req, res, next) => {
 
 // логин хийнэ
 export const login = asyncHandler(async (req, res, next) => {
-  const { username, password } = req.body;
+  const { phone, password } = req.body;
 
   // Оролтыгоо шалгана
 
-  if (!username || !password) {
+  if (!phone || !password) {
     throw new MyError("Нэвтрэх нэр болон нууц үйгээ дамжуулна уу", 400);
   }
 
   // Тухайн хэрэглэгчийн хайна
-  const user = await User.findOne({ username }).select("+password");
+  const user = await User.findOne({ phone }).select("+password");
 
   if (!user) {
     throw new MyError("Бүртгэлгүй хэрэглэгч байна", 401);
@@ -140,20 +140,20 @@ export const getUsers = asyncHandler(async (req, res, next) => {
   if (filter?.select && filter?.select !== "") {
     filters.$or = [
       {
-        username: { $regex: `${filter?.select}`, $options: "i" },
+        phone: { $regex: `${filter?.select}`, $options: "i" },
       },
       {
         role: { $regex: `${filter?.select}`, $options: "i" },
       },
     ];
   }
-  console.log("filters", filters)
+  console.log("filters", filters);
 
   const countUser = await User.countDocuments(filters);
   const users = await User.find(filters)
     .sort({ createdAt: -1 })
     .skip(page * limit)
-    .limit(limit)
+    .limit(limit);
 
   res.status(200).json({
     success: true,
@@ -326,8 +326,8 @@ export const invoiceTime = asyncHandler(async (req, res, next) => {
         data: {
           invoice_code: "SANTA_MN_INVOICE",
           sender_invoice_no: "12345678",
-          invoice_receiver_code: `${profile.username}`,
-          invoice_description: `S69 access ${profile.username}`,
+          invoice_receiver_code: `${profile.phone}`,
+          invoice_description: `S69 access ${profile.phone}`,
           amount: 20000,
           callback_url: `https://santa.mn/users/callbacks/${req.params.id}/${req.body.amount}`,
         },

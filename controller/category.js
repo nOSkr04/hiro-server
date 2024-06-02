@@ -41,10 +41,6 @@ export const getCategories = asyncHandler(async (req, res, next) => {
   });
 });
 
-<<<<<<< HEAD
-export const getCategories = asyncHandler(async (req, res, next) => {
-  const category = await Category.find();
-=======
 export const getCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id)
     .populate([{
@@ -58,11 +54,10 @@ export const getCategory = asyncHandler(async (req, res, next) => {
   if (!category) {
     throw new MyError(req.params.id + " ID-тэй категори байхгүй байна.", 404);
   }
->>>>>>> dcb4e67fbc3142463cdcf13e425fb87a95c86bc6
 
   res.status(200).json({
     success: true,
-    data: category,
+    data: product,
   });
 });
 

@@ -31,21 +31,28 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 });
 
 export const getProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id)
-  .populate([{
-    model: "Category",
-    path: "category",
-  }, {
-    model: "User",
-    path: "createUser",
-  },
-  {
-    model: "Image",
-    path: "thumbnail",
-  }, {
-    model: "Image",
-    path: "images",
-  }]);
+  const product = await Product.findById(req.params.id).populate([
+    {
+      model: "Category",
+      path: "category",
+    },
+    {
+      model: "User",
+      path: "createUser",
+    },
+    {
+      model: "Image",
+      path: "thumbnail",
+    },
+    {
+      model: "Image",
+      path: "images",
+    },
+    {
+      model: "ProductOption",
+      path: "options",
+    },
+  ]);
 
   if (!product) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
@@ -113,14 +120,6 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   if (!product) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
-
-  if (
-    product.createUser.toString() !== req.userId &&
-    req.userRole !== "admin"
-  ) {
-    throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
-  }
-
   req.body.updateUser = req.userId;
 
   for (let attr in req.body) {

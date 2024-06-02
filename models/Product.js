@@ -5,7 +5,6 @@ const ProductSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Барааны гарчиг оруулна уу"],
       unique: true,
       trim: true,
       maxlength: [
@@ -26,7 +25,7 @@ const ProductSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.ObjectId,
         ref: "Image",
-      }
+      },
     ],
     options: [
       {
@@ -39,6 +38,7 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Барааны тайлбарыг оруулна уу"],
     },
     price: Number,
+    initPrice: Number,
     discount: Number,
     category: {
       type: mongoose.Schema.ObjectId,

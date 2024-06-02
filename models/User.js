@@ -4,9 +4,9 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  phone: {
     type: String,
-    required: [true, "Хэрэглэгчийн нэрийг оруулна уу"],
+    required: [true, "Утасны дугаарыг оруулна уу"],
     unique: true,
   },
   role: {

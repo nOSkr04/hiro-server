@@ -1,6 +1,9 @@
 import express from "express";
+import { protect, authorize } from "../middleware/protect.js";
 
-import { uploadClientPhoto } from "../controller/image.js";
+import {
+  uploadClientPhoto,
+} from "../controller/image.js";
 
 const router = express.Router();
 

@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 const ProductSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      unique: true,
       trim: true,
       maxlength: [
         250,

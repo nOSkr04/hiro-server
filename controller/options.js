@@ -6,6 +6,7 @@ import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
 import ProductVariant from "../models/ProductVariant.js";
+import imageSize from "image-size";
 // /options
 function generateCombinations(arrays, prefix = []) {
   if (arrays.length === 0) {
@@ -66,6 +67,11 @@ export const createOption = asyncHandler(async (req, res, next) => {
   if (!product) {
     throw new MyError(id + " ID-тэй бараа байхгүй байна.", 404);
   }
+  if (req.body.values.length === 0) {
+    throw new MyError("Сонголтын утга оруулна уу.", 400);
+  }
+  req.body.values = req.body.values.filter((item) => item !== "");
+
   const option = await ProductOption.create(req.body);
   product.set({
     options: [...(product.options || []), option._id],
@@ -95,8 +101,12 @@ export const createOption = asyncHandler(async (req, res, next) => {
     combinations.map((val) => {
       const data = new ProductVariant({
         name: val.length > 1 ? val.join("/") : val[0],
+        selectedOptions: val.map((item, index) => {
+          return { name: options[index].name, value: item };
+        }),
         price: product.price ? product.price : 0,
         product: product,
+        image: product.images[0] ? product.images[0] : null,
         type: "DEFAULT",
         createUser: req.userId,
       });

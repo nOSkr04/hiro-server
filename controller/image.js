@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import Image from "../models/Image.js";
 import fs from "fs";
 import { url } from "inspector";
+import imageSize from "image-size";
+import { gmResize } from "../utils/gm.js";
 
 export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
   const type = req.params.type; // banner | product | user
@@ -15,6 +17,10 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
   if (!file.mimetype.startsWith("image")) {
     throw new MyError("Та зураг upload хийнэ үү.", 400);
   }
+  const size = await imageSize(file.data);
+  console.log("size", size);
+  const resize = await gmResize(file.data, 200, 200);
+  console.log("resize", resize);
   file.name = `${uuidv4()}${path.parse(file.name).ext}`;
 
   file.mv(

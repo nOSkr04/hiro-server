@@ -4,6 +4,10 @@ import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
+import HomeScreen from "../models/HomeScreen.js";
+import Product from "../models/Product.js";
+import Feature from "../models/Feature.js";
+import Category from "../models/Category.js";
 
 // /products
 export const getBanners = asyncHandler(async (req, res, next) => {
@@ -26,6 +30,32 @@ export const getBanners = asyncHandler(async (req, res, next) => {
     pagination,
   });
 });
+export const getBannerOptions = asyncHandler(async (req, res, next) => {
+  const products = await Product.find({ type: "ACTIVE" }).populate([
+    {
+      model: "Category",
+      path: "category",
+    },
+    {
+      model: "ProductOption",
+      path: "options",
+    },
+    {
+      model: "Image",
+      path: "images",
+    },
+  ]);
+  const features = await Feature.find({});
+  const categories = await Category.find({});
+  res.status(200).json({
+    success: true,
+    data: {
+      products: products,
+      features: features,
+      categories: categories,
+    },
+  });
+});
 
 export const getBanner = asyncHandler(async (req, res, next) => {
   const banner = await Banner.findById(req.params.id);
@@ -36,11 +66,28 @@ export const getBanner = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    data: product,
+    data: banner,
   });
 });
 
 export const createBanner = asyncHandler(async (req, res, next) => {
+  if (req.body.isHomeScreen) {
+    const homeScreen = await HomeScreen.findOne({});
+    if (!homeScreen) {
+      throw new MyError(
+        "HomeScreen-д баннер оруулахын тулд HomeScreen үүсгэнэ үү.",
+        400
+      );
+    }
+    if (homeScreen.banners.length > 6) {
+      throw new MyError(
+        "HomeScreen-д баннерийн тоо хязгаарлагдсан байна.",
+        400
+      );
+    }
+    homeScreen.banners.push(banner._id);
+    await homeScreen.save();
+  }
   const banner = await Banner.create(req.body);
 
   res.status(200).json({
@@ -61,7 +108,14 @@ export const deleteBanner = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findById(req.userId);
+  const homeScreen = await HomeScreen.findOne({});
 
+  if (homeScreen) {
+    homeScreen.banners = homeScreen.banners.filter(
+      (item) => item.toString() !== req.params.id
+    );
+    await homeScreen.save();
+  }
   banner.remove();
 
   res.status(200).json({

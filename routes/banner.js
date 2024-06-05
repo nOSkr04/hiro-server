@@ -7,6 +7,7 @@ import {
   createBanner,
   deleteBanner,
   updateBanner,
+  getBannerOptions,
 } from "../controller/banner.js";
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router
   .get(getBanners)
   .post(protect, authorize("admin", "operator"), createBanner);
 
+router.route("/options").get(getBannerOptions);
 router
   .route("/:id")
   .get(getBanner)

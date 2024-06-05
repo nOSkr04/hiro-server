@@ -9,23 +9,33 @@ const ProductVariantSchema = new mongoose.Schema(
       trim: true,
       maxlength: [250, "Сонголтын нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
+    selectedOptions: [
+      {
+        name: String,
+        value: String,
+      },
+    ],
     type: {
       type: String,
       enum: ["DEFAULT", "MANUAL"],
     },
-    images: [
-      {
-        url: String,
-        blurHash: String,
-      },
-    ],
+    image: {
+      url: String,
+      blurHash: String,
+    },
     availableForSale: {
       type: Boolean,
       default: false,
     },
     price: Number,
-    quantity: Number,
-    firstQuantity: Number,
+    quantity: {
+      type: Number,
+      default: 0,
+    },
+    firstQuantity: {
+      type: Number,
+      default: 0,
+    },
     product: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",

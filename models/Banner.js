@@ -2,10 +2,29 @@ import mongoose from "mongoose";
 
 const BannerSchema = new mongoose.Schema(
   {
-    url: {
+    title: {
       type: String,
+      required: [true, "Гарчиг оруулна уу"],
+      trim: true,
+      maxlength: [250, "Гарчигийн урт дээд тал нь 250 тэмдэгт байх ёстой."],
     },
-    blurHash: String,
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Тайлбарын урт дээд тал нь 500 тэмдэгт байх ёстой."],
+    },
+    feature: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Feature",
+    },
+    isHomeScreen: {
+      type: Boolean,
+      default: false,
+    },
+    image: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Image",
+    },
     product: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",

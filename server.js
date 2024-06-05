@@ -14,7 +14,9 @@ import rateLimit from "express-rate-limit";
 import hpp from "hpp";
 import color from "colors";
 // Router оруулж ирэх
-import commentRoutes from './routes/comment.js';
+import featureRoutes from "./routes/feature.js";
+import homeScreenRoutes from "./routes/homeScreen.js";
+import commentRoutes from "./routes/comment.js";
 import bannerRoutes from "./routes/banner.js";
 import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/products.js";
@@ -27,6 +29,8 @@ import imagesRoutes from "./routes/image.js";
 import variantsRoutes from "./routes/variant.js";
 import errorHandler from "./middleware/error.js";
 import connectDB from "./config/db.js";
+import { initHomeScreen } from "./initialize/homeScreen.js";
+import { initUser } from "./initialize/user.js";
 // Аппын тохиргоог process.env рүү ачаалах
 dotenv.config({ path: "./config/config.env" });
 
@@ -48,6 +52,9 @@ var whitelist = [
   "https://www.s69.mn",
   "http://192.168.1.112:3005",
   "http://localhost:5173",
+  "http://192.168.1.91:1234",
+  "http://192.168.1.8:3001",
+  "http://192.168.1.8:3000",
 ];
 
 // Өөр домэйн дээр байрлах клиент вэб аппуудаас шаардах шаардлагуудыг энд тодорхойлно
@@ -116,9 +123,12 @@ app.use("/wallets", walletsRoutes);
 app.use("/notification", notificationsRoutes);
 app.use("/images", imagesRoutes);
 app.use("/categories", categoryRoutes);
+app.use("/features", featureRoutes);
+app.use("/homeScreens", homeScreenRoutes);
 // Алдаа үүсэхэд барьж авч алдааны мэдээллийг клиент тал руу автоматаар мэдээлнэ
 app.use(errorHandler);
-
+initHomeScreen();
+initUser();
 // express сэрвэрийг асаана.
 const server = app.listen(
   process.env.PORT,

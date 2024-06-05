@@ -7,6 +7,7 @@ import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
 import ProductVariant from "../models/ProductVariant.js";
 import ProductOption from "../models/ProductOption.js";
+import HomeScreen from "../models/HomeScreen.js";
 
 // /products
 export const getProducts = asyncHandler(async (req, res, next) => {
@@ -85,6 +86,16 @@ export const getProduct = asyncHandler(async (req, res, next) => {
 
 export const createProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.create(req.body);
+  const homeScreen = await HomeScreen.findOne({});
+
+  if (homeScreen.newProducts.length > 6) {
+    homeScreen.newProducts.shift();
+    homeScreen.newProducts.push(product._id);
+    await homeScreen.save();
+  } else {
+    homeScreen.newProducts.push(product._id);
+    await homeScreen.save();
+  }
 
   res.status(200).json({
     success: true,

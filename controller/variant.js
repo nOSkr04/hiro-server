@@ -65,7 +65,7 @@ export const createVariant = asyncHandler(async (req, res, next) => {
   const title = array.map((val) => val.value).join("/");
 
   const variant = await new ProductVariant({
-    title: title,
+    name: title,
     type: "MANUAL",
     price: req.body.price || 0,
     quantiy: req.body.quantiy || 0,
@@ -73,13 +73,15 @@ export const createVariant = asyncHandler(async (req, res, next) => {
     createUser: req.user,
   }).save();
 
-  await new Variant({
-    name: val.join("/"),
-    price: product.price,
-    product: product,
-    type: "DEFAULT",
-  }).save();
-
+  product.set({
+    variants: [...(product.variants || []), variant._id],
+  });
+  if (req.body.quantiy > 0) {
+    product.set({
+      quantiy: product.quantiy + req.body.quantiy,
+    });
+  }
+  await product.save();
   res.status(200).json({
     success: true,
     data: variant,
@@ -98,6 +100,16 @@ export const deleteVariant = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findById(req.userId);
+  const product = await Product.findById(variant.product);
+  product.set({
+    variants: product.variants.filter((id) => id.toString() !== req.params.id),
+  });
+  if (variant.quantiy > 0) {
+    product.set({
+      quantiy: product.quantiy - variant.quantiy,
+    });
+  }
+  await product.save();
   await variant.remove();
   res.status(200).json({
     success: true,
@@ -108,7 +120,7 @@ export const deleteVariant = asyncHandler(async (req, res, next) => {
 
 export const updateVariant = asyncHandler(async (req, res, next) => {
   const variant = await ProductVariant.findById(req.params.id);
-
+  const variantQuantity = variant.quantiy;
   if (!variant) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
@@ -127,7 +139,13 @@ export const updateVariant = asyncHandler(async (req, res, next) => {
   }
 
   await variant.save();
-
+  if (req.body.quantiy > 0) {
+    const product = await Product.findById(variant.product);
+    product.set({
+      quantiy: product.quantiy - variantQuantity + req.body.quantiy,
+    });
+    await product.save();
+  }
   res.status(200).json({
     success: true,
     data: variant,

@@ -7,7 +7,14 @@ const CategorySchema = new mongoose.Schema(
       required: [true, "Категорийн нэр оруулна уу"],
       unique: true,
       trim: true,
-      maxlength: [250, "Категорийн нэр урт дээд тал нь 250 тэмдэгт байх ёстой."],
+      maxlength: [
+        250,
+        "Категорийн нэр урт дээд тал нь 250 тэмдэгт байх ёстой.",
+      ],
+    },
+    productCount: {
+      type: Number,
+      default: 0,
     },
     icon: {
       type: String,

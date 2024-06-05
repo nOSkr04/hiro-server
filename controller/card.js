@@ -39,7 +39,7 @@ export const getCard = asyncHandler(async (req, res, next) => {
 });
 
 export const getOwnCard = asyncHandler(async (req, res, next) => {
-  const card = await Card.find({user: req.userId});
+  const card = await Card.find({ user: req.userId });
 
   res.status(200).json({
     success: true,
@@ -49,11 +49,11 @@ export const getOwnCard = asyncHandler(async (req, res, next) => {
 
 export const createCard = asyncHandler(async (req, res, next) => {
   const productVariant = await ProductVariant.findById(req.body.productVariant);
-  if(!productVariant || productVariant.quantity < req.body.quantity){
+  if (!productVariant || productVariant.quantity < req.body.quantity) {
     throw new MyError("Таны сонгосон бараа байхгүй байна.", 400);
   }
   const card = await Card.create(req.body);
-  if(!card.user){
+  if (!card.user) {
     card.user = req.userId;
   }
   card.type = "NEW";
@@ -73,7 +73,7 @@ export const deleteCard = asyncHandler(async (req, res, next) => {
     throw new MyError(req.params.id + " ID-тэй байхгүй байна.", 404);
   }
 
-  if (req.userRole !== "admin" || card.createUser.toString() !== req.userId ) {
+  if (req.userRole !== "admin" || card.createUser.toString() !== req.userId) {
     throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
   }
   const productVariant = await ProductVariant.findById(card.productVariant);

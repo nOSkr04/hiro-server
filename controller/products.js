@@ -8,6 +8,7 @@ import User from "../models/User.js";
 import ProductVariant from "../models/ProductVariant.js";
 import ProductOption from "../models/ProductOption.js";
 import HomeScreen from "../models/HomeScreen.js";
+import Category from "../models/Category.js";
 
 // /products
 export const getProducts = asyncHandler(async (req, res, next) => {
@@ -17,7 +18,7 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 
   [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
   const pagination = await paginate(page, limit, Product);
-
+  // similar products
   const products = await Product.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
@@ -95,6 +96,10 @@ export const createProduct = asyncHandler(async (req, res, next) => {
   } else {
     homeScreen.newProducts.push(product._id);
     await homeScreen.save();
+  }
+  const category = await Category.findById(req.body.category);
+  if (!category) {
+    throw new MyError("Та категори сонгоно уу.", 400);
   }
 
   res.status(200).json({

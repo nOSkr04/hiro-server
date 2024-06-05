@@ -48,15 +48,23 @@ export const gmResize = (buffer, size) => {
       });
   });
 };
-export const resizeA = async (file) => {
+export const createThumbnail = async (file) => {
   if (!file) {
     return null;
   }
 
-  const { data, info } = await sharp(file.buffer).ensureAlpha().raw().toBuffer({
-    resolveWithObject: true,
-  });
-
-  const blurHash = encode(data, info.width, info.height, 4, 3);
-  return blurHash;
+  const { data, info } = await sharp(file)
+    .raw()
+    .resize({ fit: sharp.fit.center })
+    .toFormat("png")
+    .png({ quality: 100 })
+    .toBuffer({ resolveWithObject: true });
+  // const pixelArray = new Uint8ClampedArray(data);
+  // console.log("pixelArray", pixelArray);
+  // const { width, height, channels } = info;
+  // const img = await sharp(pixelArray, {
+  //   raw: { width, height, channels },
+  // }).toFile("my-changed-image.jpg");
+  // console.log("img", img);
+  return data;
 };

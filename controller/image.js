@@ -6,7 +6,7 @@ import Image from "../models/Image.js";
 import fs from "fs";
 import { url } from "inspector";
 import imageSize from "image-size";
-import { gmResize } from "../utils/gm.js";
+import { createThumbnail, setBlurHash } from "../utils/gm.js";
 
 export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
   const type = req.params.type; // banner | product | user
@@ -19,8 +19,11 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
   }
   const size = await imageSize(file.data);
   console.log("size", size);
-  const resize = await gmResize(file.data, 200, 200);
+  const resize = await createThumbnail(file.data);
   console.log("resize", resize);
+
+  const blurHash = await setBlurHash(file.data);
+  console.log("blurHash", blurHash);
   file.name = `${uuidv4()}${path.parse(file.name).ext}`;
 
   file.mv(
@@ -41,6 +44,8 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
         type: type,
         user: req.userId,
         url: imageUrl,
+        blurHash: blurHash,
+        thumbnail: imageUrl,
       });
 
       res.status(200).json({

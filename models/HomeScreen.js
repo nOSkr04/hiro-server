@@ -2,6 +2,18 @@ import mongoose from "mongoose";
 
 const HomeScreenSchema = new mongoose.Schema(
   {
+    instagrams: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Instagram",
+      },
+    ],
+    blogs: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Blog",
+      },
+    ],
     banners: [
       {
         type: mongoose.Schema.ObjectId,

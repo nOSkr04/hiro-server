@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 import hpp from "hpp";
 import color from "colors";
 // Router оруулж ирэх
+import orderRoutes from "./routes/order.js";
 import blogRoutes from "./routes/blog.js";
 import instagramRoutes from "./routes/instagram.js";
 import featureRoutes from "./routes/feature.js";
@@ -114,6 +115,7 @@ var accessLogStream = rfs.createStream("access.log", {
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // REST API RESOURSE
+app.use("/orders", orderRoutes);
 app.use("/blogs", blogRoutes);
 app.use("/instagrams", instagramRoutes);
 app.use("/comments", commentRoutes);

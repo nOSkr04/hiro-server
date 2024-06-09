@@ -1,5 +1,4 @@
 import Banner from "../models/Banner.js";
-
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
@@ -52,6 +51,14 @@ export const createCard = asyncHandler(async (req, res, next) => {
   if (!productVariant || productVariant.quantity < req.body.quantity) {
     throw new MyError("Таны сонгосон бараа байхгүй байна.", 400);
   }
+  if(productVariant.quantity < 1){
+    throw new MyError("Таны сонгосон бараа байхгүй байна.", 400);
+  }
+  if( req.body.quantity < 1){
+    req.body.quantity = 1;
+  }
+  req.body.price = productVariant.price;
+  req.body.totalPrice = productVariant.price * req.body.quantity;
   const card = await Card.create(req.body);
   if (!card.user) {
     card.user = req.userId;
@@ -59,7 +66,7 @@ export const createCard = asyncHandler(async (req, res, next) => {
   card.type = "NEW";
   card.save();
 
-  productVariant.quantity -= req.body.quantity;
+  // productVariant.quantity -= req.body.quantity;
   res.status(200).json({
     success: true,
     data: card,
@@ -76,8 +83,8 @@ export const deleteCard = asyncHandler(async (req, res, next) => {
   if (req.userRole !== "admin" || card.createUser.toString() !== req.userId) {
     throw new MyError("Та зөвхөн өөрийнхөө номыг л засварлах эрхтэй", 403);
   }
-  const productVariant = await ProductVariant.findById(card.productVariant);
-  productVariant.quantity += card.quantity;
+  // const productVariant = await ProductVariant.findById(card.productVariant);
+  // productVariant.quantity += card.quantity;
   const user = await User.findById(req.userId);
 
   card.remove();

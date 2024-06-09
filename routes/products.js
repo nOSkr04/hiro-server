@@ -7,6 +7,7 @@ import {
   createProduct,
   deleteProduct,
   updateProduct,
+  minMaxPrice,
 } from "../controller/products.js";
 
 const router = express.Router();
@@ -16,6 +17,8 @@ router
   .route("/")
   .get(getProducts)
   .post(protect, authorize("admin", "operator"), createProduct);
+
+router.route("/min-max-price").get(minMaxPrice);
 
 router
   .route("/:id")

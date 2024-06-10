@@ -177,6 +177,7 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const updateProduct = asyncHandler(async (req, res, next) => {
+  console.log("req".body, req.body);
   const product = await Product.findById(req.params.id).populate({
     model: "Category",
     path: "category",

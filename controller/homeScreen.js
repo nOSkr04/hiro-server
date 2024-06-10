@@ -1,6 +1,7 @@
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import HomeScreen from "../models/HomeScreen.js";
+import { path } from "@ffmpeg-installer/ffmpeg";
 
 // /homeScreen
 export const getHomeScreen = asyncHandler(async (req, res, next) => {
@@ -8,10 +9,20 @@ export const getHomeScreen = asyncHandler(async (req, res, next) => {
     {
       model: "Category",
       path: "categories",
-      populate: {
-        model: "Category",
-        path: "childCategories",
-      },
+      populate: [
+        {
+          model: "Category",
+          path: "childCategories",
+          populate: {
+            model: "Image",
+            path: "icon",
+          },
+        },
+        {
+          model: "Image",
+          path: "icon",
+        },
+      ],
     },
     {
       model: "Product",
@@ -20,6 +31,10 @@ export const getHomeScreen = asyncHandler(async (req, res, next) => {
     {
       model: "Product",
       path: "newProducts",
+    },
+    {
+      model: "Banner",
+      path: "banners",
     },
     {
       model: "Feature",

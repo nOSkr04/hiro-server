@@ -22,8 +22,8 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
   const resize = await createThumbnail(file.data);
   console.log("resize", resize);
 
-  // const blurHash = await setBlurHash(file.data);
-  // console.log("blurHash", blurHash);
+  const blurHash = await setBlurHash(file.data);
+  console.log("blurHash", blurHash);
   file.name = `${uuidv4()}${path.parse(file.name).ext}`;
 
   file.mv(
@@ -44,7 +44,7 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
         type: type,
         user: req.userId,
         url: imageUrl,
-        // blurHash: blurHash,
+        blurHash: blurHash,
         thumbnail: imageUrl,
       });
 

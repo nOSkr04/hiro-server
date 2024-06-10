@@ -191,7 +191,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     product[attr] = req.body[attr];
   }
 
-  if (req.body.category.toString() !== productCategory._id.toString()) {
+  if (req.body.category !== productCategory._id.toString()) {
     const parent = await Category.findOne({
       parentCategory: req.body.category,
     });

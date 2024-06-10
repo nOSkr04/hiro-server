@@ -35,6 +35,7 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: [true, "Барааны тайлбарыг оруулна уу"],
     },
+    quantity: Number,
     price: Number,
     initPrice: Number,
     discount: Number,

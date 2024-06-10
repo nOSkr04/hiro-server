@@ -120,10 +120,10 @@ export const deleteVariant = asyncHandler(async (req, res, next) => {
 
 export const updateVariant = asyncHandler(async (req, res, next) => {
   const variant = await ProductVariant.findById(req.params.id);
-  const variantQuantity = variant.quantiy;
   if (!variant) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
+  const variantQuantity = variant.quantity;
 
   if (
     variant.createUser.toString() !== req.userId &&
@@ -139,10 +139,10 @@ export const updateVariant = asyncHandler(async (req, res, next) => {
   }
 
   await variant.save();
-  if (req.body.quantiy > 0) {
+  if (req.body.quantity > 0) {
     const product = await Product.findById(variant.product);
     product.set({
-      quantiy: product.quantiy - variantQuantity + req.body.quantiy,
+      quantity: product.quantity - variantQuantity + req.body.quantity,
     });
     await product.save();
   }

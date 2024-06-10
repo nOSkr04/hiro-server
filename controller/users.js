@@ -4,10 +4,10 @@ import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import sendEmail from "../utils/email.js";
 import crypto from "crypto";
-import Wallet from "../models/Wallet.js";
 // import sendNotification from "../utils/sendNotification.js";
 // import Notification from "../models/Notification.js";
 import axios from "axios";
+import Otp from "../models/Otp.js";
 export const authMeUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.userId);
   if (!user) {
@@ -305,136 +305,23 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const invoiceTime = asyncHandler(async (req, res, next) => {
-  const profile = await User.findById(req.params.id);
-  await axios({
-    method: "post",
-    url: "https://merchant.qpay.mn/v2/auth/token",
-    headers: {
-      Authorization: `Basic U0FOVEFfTU46Z3F2SWlKSnI=`,
-    },
-  })
-    .then((response) => {
-      const token = response.data.access_token;
-
-      axios({
-        method: "post",
-        url: "https://merchant.qpay.mn/v2/invoice",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
-          invoice_code: "SANTA_MN_INVOICE",
-          sender_invoice_no: "12345678",
-          invoice_receiver_code: `${profile.phone}`,
-          invoice_description: `S69 access ${profile.phone}`,
-          amount: 20000,
-          callback_url: `https://santa.mn/users/callbacks/${req.params.id}/${req.body.amount}`,
-        },
-      })
-        .then(async (response) => {
-          req.body.urls = response.data.urls;
-          req.body.qrImage = response.data.qr_image;
-          req.body.invoiceId = response.data.invoice_id;
-          const wallet = await Wallet.create(req.body);
-          profile.invoiceId = wallet._id;
-          profile.save();
-          res.status(200).json({
-            success: true,
-            data: wallet,
-          });
-        })
-        .catch((error) => {
-          console.log(error.response.data);
-        });
-    })
-    .catch((error) => {
-      console.log(error.response.data);
-    });
-});
-
-export const invoiceCheck = asyncHandler(async (req, res) => {
-  await axios({
-    method: "post",
-    url: "https://merchant.qpay.mn/v2/auth/token",
-    headers: {
-      Authorization: `Basic U0FOVEFfTU46Z3F2SWlKSnI=`,
-    },
-  })
-    .then((response) => {
-      const token = response.data.access_token;
-      axios({
-        method: "post",
-        url: "https://merchant.qpay.mn/v2/payment/check",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
-          object_type: "INVOICE",
-          object_id: req.params.id,
-          page_number: 1,
-          page_limit: 100,
-          callback_url: `https://santa.mn/users/check/challbacks/${req.params.id}/${req.params.numId}`,
-        },
-      })
-        .then(async (response) => {
-          const profile = await User.findById(req.params.numId);
-          const count = response.data.count;
-          if (count === 0) {
-            res.status(402).json({
-              success: false,
-            });
-          } else {
-            // const price = parseInt(req.params.numId, 10);
-            profile.isPayment = true;
-            profile.save();
-            // await Notification.create({
-            //   title: `Үйлчилгээний эрх нээгдлээ`,
-            //   users: profile._id,
-            // });
-            // if (profile.expoPushToken) {
-            //   await sendNotification(
-            //     profile.expoPushToken,
-            //     "Үйлчилгээний эрх нээгдлээ"
-            //   );
-            // }
-            // }
-            res.status(200).json({
-              success: true,
-              data: profile,
-            });
-          }
-        })
-        .catch((error) => {
-          // console.log(error, "error");
-        });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
-
-export const chargeTime = asyncHandler(async (req, res, next) => {
-  const profile = await User.findById(req.params.id);
-  const price = parseInt(req.params.numId, 10);
-  // if (price === 100) {
-  profile.isPayment = true;
-  profile.save();
-  await User.updateOne(
-    { _id: profile._id },
-    { $inc: { notificationCount: 1 } }
-  );
-  if (profile.expoPushToken) {
-    await sendNotification(profile.expoPushToken, `Үйлчилгээний эрх нээгдлээ`);
+export const getOtp = asyncHandler(async (req, res, next) => {
+  const phone = req.body.phone;
+  const user = await User.findOne({ phone: phone });
+  if (!user) {
+    throw new MyError("Бүртгэлгүй хэрэглэгч байна", 401);
   }
+  const otp = Math.floor(1000 + Math.random() * 9000);
+  await new Otp({ user, otp }).save();
+});
 
-  await Notification.create({
-    title: `Үйлчилгээний эрх нээгдлээ`,
-    users: profile._id,
-  });
-  // }
+export const verifyOtp = asyncHandler(async (req, res, next) => {
+  const otp = req.body.otp;
+  const verify = await Otp.findOne({ otp: otp });
+  if (!verify) {
+    throw new MyError("Баталгаажуулах код буруу байна", 401);
+  }
   res.status(200).json({
     success: true,
-    data: profile,
   });
 });

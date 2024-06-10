@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
-const WalletSchema = new mongoose.Schema(
+const InvoiceSchema = new mongoose.Schema(
   {
     createUser: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    phone: String,
     invoiceId: {
       type: String,
       default: null,
@@ -29,4 +30,4 @@ const WalletSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export default mongoose.model("Wallet", WalletSchema);
+export default mongoose.model("Invoice", InvoiceSchema);

@@ -15,10 +15,10 @@ export const getProducts = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page, 10) - 1 || 0;
   const limit = parseInt(req.query.limit, 10) || 10;
   const sort = req.query.sort || { createdAt: -1 };
-  if(filter.category) {
+  if (filter.category) {
     filters.category = filter.category;
   }
-  if(filter.min && filter.max) {
+  if (filter.min && filter.max) {
     filters.price = { $gte: filter.min, $lte: filter.max };
   }
   if (filter?.query && filter?.query !== "") {
@@ -97,7 +97,7 @@ export const getProduct = asyncHandler(async (req, res, next) => {
 export const createProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.create(req.body);
   const homeScreen = await HomeScreen.findOne({});
-  
+
   if (homeScreen.newProducts.length > 6) {
     homeScreen.newProducts.shift();
     homeScreen.newProducts.push(product._id);
@@ -107,15 +107,19 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     await homeScreen.save();
   }
   const category = await Category.findById(req.body.category);
-  const parentCategory = await Category.findOne({ parentCategory: req.body.category });
+  const parentCategory = await Category.findOne({
+    parentCategory: req.body.category,
+  });
   if (parentCategory) {
     throw new MyError("Та үндсэн категори сонгоно уу.", 400);
   }
   if (!category) {
     throw new MyError("Та категори сонгоно уу.", 400);
   }
-  if(category.parentCategory) {
-    await Category.findByIdAndUpdate(category.parentCategory, { $inc: { productCount: 1 } });
+  if (category.parentCategory) {
+    await Category.findByIdAndUpdate(category.parentCategory, {
+      $inc: { productCount: 1 },
+    });
   }
   category.productCount += 1;
   await category.save();
@@ -127,11 +131,10 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 
 export const deleteProduct = asyncHandler(async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate({
-        model: "Category",
-        path: "category",
-      })
+    const product = await Product.findById(req.params.id).populate({
+      model: "Category",
+      path: "category",
+    });
 
     if (!product) {
       throw new MyError(req.params.id + " ID-тэй ном байхгүй байна.", 404);
@@ -158,8 +161,10 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
     product.category.productCount -= 1;
     await product.category.save();
 
-    if(product.category.parentCategory) {
-      await Category.findByIdAndUpdate(product.category.parentCategory, { $inc: { productCount: -1 } });
+    if (product.category.parentCategory) {
+      await Category.findByIdAndUpdate(product.category.parentCategory, {
+        $inc: { productCount: -1 },
+      });
     }
     res.status(200).json({
       success: true,
@@ -172,11 +177,10 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const updateProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id)
-    .populate({
-      model: "Category",
-      path: "category",
-    });
+  const product = await Product.findById(req.params.id).populate({
+    model: "Category",
+    path: "category",
+  });
   const productCategory = product.category;
   if (!product) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
@@ -188,18 +192,28 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   }
 
   if (req.body.category.toString() !== productCategory._id.toString()) {
-    const parent = await Category.findOne({ parentCategory: req.body.category });
+    const parent = await Category.findOne({
+      parentCategory: req.body.category,
+    });
     if (parent) {
       throw new MyError("Та үндсэн категори сонгоно уу.", 400);
     }
-    await Category.findByIdAndUpdate(productCategory._id.toString(), { $inc: { productCount: -1 } });
-    if( productCategory.parentCategory) {
-      await Category.findByIdAndUpdate(productCategory.parentCategory, { $inc: { productCount: -1 } });
+    await Category.findByIdAndUpdate(productCategory._id.toString(), {
+      $inc: { productCount: -1 },
+    });
+    if (productCategory.parentCategory) {
+      await Category.findByIdAndUpdate(productCategory.parentCategory, {
+        $inc: { productCount: -1 },
+      });
     }
-    await Category.findByIdAndUpdate(req.body.category, { $inc: { productCount: 1 } });
+    await Category.findByIdAndUpdate(req.body.category, {
+      $inc: { productCount: 1 },
+    });
     const parentCategory = await Category.findById(req.body.category);
-    if(parentCategory.parentCategory) {
-      await Category.findByIdAndUpdate(parentCategory.parentCategory, { $inc: { productCount: 1 } });
+    if (parentCategory.parentCategory) {
+      await Category.findByIdAndUpdate(parentCategory.parentCategory, {
+        $inc: { productCount: 1 },
+      });
     }
   }
   product.save();

@@ -5,7 +5,6 @@ const CategorySchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Категорийн нэр оруулна уу"],
-      unique: true,
       trim: true,
       maxlength: [
         250,
@@ -17,8 +16,8 @@ const CategorySchema = new mongoose.Schema(
       default: 0,
     },
     icon: {
-      type: String,
-      default: "default.jpg",
+      type: mongoose.Schema.ObjectId,
+      ref: "Image",
     },
     color: {
       type: String,

@@ -2,6 +2,7 @@ import Category from "../models/Category.js";
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
+import HomeScreen from "../models/HomeScreen.js";
 
 // /products
 export const getCategories = asyncHandler(async (req, res, next) => {
@@ -11,10 +12,10 @@ export const getCategories = asyncHandler(async (req, res, next) => {
   const limit = parseInt(req.query.limit, 10) || 10;
   const filter = req.query.filter || {};
 
-  if (filter?.select && filter?.select !== "") {
+  if (filter?.query && filter?.query !== "") {
     filters.$or = [
       {
-        name: { $regex: `${filter?.select}`, $options: "i" },
+        name: { $regex: `${filter?.query}`, $options: "i" },
       },
     ];
   }
@@ -66,6 +67,10 @@ export const getCategory = asyncHandler(async (req, res, next) => {
 });
 
 export const createCategory = asyncHandler(async (req, res, next) => {
+  req.body.name = req.body.name.replace(
+    req.body.name[0],
+    req.body.name[0].toUpperCase()
+  );
   const category = await Category.create(req.body);
   if (req.body.parentCategory) {
     const parentCategory = await Category.findById(req.body.parentCategory);
@@ -74,6 +79,10 @@ export const createCategory = asyncHandler(async (req, res, next) => {
     }
     parentCategory.childCategories.push(category._id);
     parentCategory.save();
+  } else {
+    const homeScreen = await HomeScreen.findOne();
+    homeScreen.categories.push(category._id);
+    await homeScreen.save();
   }
   res.status(200).json({
     success: true,

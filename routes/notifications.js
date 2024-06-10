@@ -9,7 +9,7 @@ import {
   getNotification,
 } from "../controller/notification.js";
 
-//"/api/v1/wallets"
+//"/api/v1/notifications"
 router
   .route("/")
   .get(protect, getNotification)

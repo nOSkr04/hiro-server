@@ -12,11 +12,11 @@ const router = express.Router();
 //"/HomeScreen"
 router
   .route("/")
+  .get(getHomeScreen)
   .post(protect, authorize("admin", "operator"), createHomeScreen);
 
 router
   .route("/:id")
-  .get(getHomeScreen)
   .put(protect, authorize("admin", "operator"), updateHomeScreen);
 
 export default router;

@@ -4,7 +4,7 @@ import HomeScreen from "../models/HomeScreen.js";
 
 // /homeScreen
 export const getHomeScreen = asyncHandler(async (req, res, next) => {
-  const homeScreen = await HomeScreen.findById(req.params.id).populate([
+  const homeScreen = await HomeScreen.find().populate([
     {
       model: "Category",
       path: "categories",

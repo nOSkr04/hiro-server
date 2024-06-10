@@ -13,9 +13,6 @@ import {
   logout,
   authMeUser,
   userPrivacy,
-  chargeTime,
-  invoiceCheck,
-  invoiceTime,
   deleteMe,
   adultVerify,
 } from "../controller/users.js";
@@ -29,8 +26,6 @@ router.route("/logout").get(protect, logout);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").post(resetPassword);
 router.route("/privacy").get(userPrivacy);
-router.route("/callbacks/:id/:numId").get(chargeTime);
-router.route("/check/challbacks/:id/:numId").get(invoiceCheck);
 
 router.use(protect);
 
@@ -42,7 +37,6 @@ router
 router.route("/me").get(authMeUser);
 router.route("/deleteAccount").post(deleteMe);
 router.route("/adultVerify").post(adultVerify);
-router.route("/invoice/:id").post(invoiceTime);
 
 router
   .route("/:id")

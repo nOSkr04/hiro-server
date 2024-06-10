@@ -6,14 +6,18 @@ const OrderSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    products: [{
-      type: mongoose.Schema.ObjectId,
-      ref: "Product",
-    }],
-    cards: [{
+    products: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Product",
+      },
+    ],
+    cards: [
+      {
         type: mongoose.Schema.ObjectId,
         ref: "Card",
-    }],
+      },
+    ],
     quantity: {
       type: Number,
       required: true,
@@ -32,9 +36,13 @@ const OrderSchema = new mongoose.Schema(
       enum: ["unpaid", "paid"],
       default: "unpaid",
     },
+    isPaymet: {
+      type: Boolean,
+      default: false,
+    },
     address: {
       type: String,
-    //   required: true,
+      //   required: true,
     },
     phone: {
       type: String,
@@ -42,11 +50,15 @@ const OrderSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-    //   required: true,
+      //   required: true,
     },
     email: {
       type: String,
-    //   required: true,
+      //   required: true,
+    },
+    invoice: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Invoice",
     },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }

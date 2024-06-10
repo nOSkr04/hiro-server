@@ -7,6 +7,9 @@ import {
   createOrder,
   deleteOrder,
   updateOrder,
+  chargeTime,
+  invoiceCheck,
+  invoiceTime,
 } from "../controller/order.js";
 
 const router = express.Router();
@@ -16,6 +19,10 @@ router
   .route("/")
   .get(getOrders)
   .post(protect, authorize("admin", "operator"), createOrder);
+
+router.route("/invoice").post(invoiceTime);
+router.route("/callbacks/:id/:numId").get(chargeTime);
+router.route("/invoiceCheck").get(invoiceCheck);
 
 router
   .route("/:id")

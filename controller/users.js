@@ -321,6 +321,10 @@ export const verifyOtp = asyncHandler(async (req, res, next) => {
   if (!verify) {
     throw new MyError("Баталгаажуулах код буруу байна", 401);
   }
+  verify.user.otpVerified = true;
+  await verify.user.save();
+  await verify.remove();
+
   res.status(200).json({
     success: true,
   });

@@ -15,7 +15,7 @@ const OtpSchema = new mongoose.Schema(
     //   default: Date.now,
     //   index: { expires: 600 },
     // },
-    users: {
+    user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },

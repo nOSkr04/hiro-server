@@ -195,6 +195,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     const parent = await Category.findOne({
       parentCategory: req.body.category,
     });
+    console.log("parent", parent);
     if (parent) {
       throw new MyError("Та үндсэн категори сонгоно уу.", 400);
     }

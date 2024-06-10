@@ -31,6 +31,16 @@ export const getHomeScreen = asyncHandler(async (req, res, next) => {
     {
       model: "Product",
       path: "newProducts",
+      populate: [
+        {
+          model: "Image",
+          path: "thumbnail",
+        },
+        {
+          model: "Image",
+          path: "images",
+        },
+      ],
     },
     {
       model: "Banner",

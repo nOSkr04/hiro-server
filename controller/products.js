@@ -177,8 +177,6 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 });
 
 export const updateProduct = asyncHandler(async (req, res, next) => {
-  console.log("req.params.id", req.params.id);
-  console.log("req.body", req.body);
   const product = await Product.findById(req.params.id).populate({
     model: "Category",
     path: "category",
@@ -193,8 +191,10 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   for (let attr in req.body) {
     product[attr] = req.body[attr];
   }
-  console.log("category", req.body.category, productCategory._id.toString());
-  if (req.body.category !== productCategory._id.toString()) {
+  if (
+    req.body.category &&
+    req.body.category !== productCategory._id.toString()
+  ) {
     const parent = await Category.findOne({
       parentCategory: req.body.category,
     });

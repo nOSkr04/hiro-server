@@ -181,16 +181,17 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     model: "Category",
     path: "category",
   });
-  const productCategory = product.category;
   if (!product) {
     throw new MyError(req.params.id + " ID-тэй ном байхгүйээээ.", 400);
   }
+  const productCategory = product.category;
+
   req.body.updateUser = req.userId;
 
   for (let attr in req.body) {
     product[attr] = req.body[attr];
   }
-
+  console.log("category", req.body.category, productCategory._id.toString());
   if (req.body.category !== productCategory._id.toString()) {
     const parent = await Category.findOne({
       parentCategory: req.body.category,

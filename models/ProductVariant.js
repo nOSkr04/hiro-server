@@ -20,8 +20,8 @@ const ProductVariantSchema = new mongoose.Schema(
       enum: ["DEFAULT", "MANUAL"],
     },
     image: {
-      url: String,
-      blurHash: String,
+      type: mongoose.Schema.ObjectId,
+      ref: "Image",
     },
     availableForSale: {
       type: Boolean,

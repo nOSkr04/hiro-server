@@ -153,7 +153,7 @@ export const updateVariant = asyncHandler(async (req, res, next) => {
 });
 
 export const updateManyVariants = asyncHandler(async (req, res, next) => {
-  const variantsArray = req.body;
+  const variantsArray = req.body.values;
   try {
     variantsArray.map(async (item) => {
       const ids = item.id;

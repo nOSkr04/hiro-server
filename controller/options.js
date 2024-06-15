@@ -25,23 +25,41 @@ function generateCombinations(arrays, prefix = []) {
 }
 
 export const getOptions = asyncHandler(async (req, res, next) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
-  const sort = req.query.sort;
+  const filters = {};
 
-  [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
-  const pagination = await paginate(page, limit, Option);
-
-  const options = await ProductOption.find(req.query)
-    .sort(sort)
-    .skip(pagination.start - 1)
-    .limit(limit);
+  const page = parseInt(req.query.page, 10) - 1 || 0;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const filter = req.query.filter || {};
+  if(filter.product){
+    filters.product = filter.product;
+  }
+  if (filter?.query && filter?.query !== "") {
+    filters.$or = [
+      {
+        name: { $regex: `${filter?.query}`, $options: "i" },
+      },
+    ];
+  }
+  console.log("filters", filters);
+  const options = await ProductOption.find(filters)
+    .sort({ createdAt: -1 })
+    .skip(page * limit)
+    .limit(limit)
+    .populate([
+      {
+        model: "Images",
+        path: "images",
+      },
+      {
+        model: "Product",
+        path: "product",
+      },
+    ]);
 
   res.status(200).json({
     success: true,
     count: options.length,
     data: options,
-    pagination,
   });
 });
 

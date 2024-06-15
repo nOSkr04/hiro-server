@@ -47,10 +47,10 @@ export const createInstagram = asyncHandler(async (req, res, next) => {
   const homeScreen = await HomeScreen.findOne({});
   const insta = await Instagram.create(req.body);
 
-  if (homeScreen.insta.length > 4) {
-    homeScreen.insta.shift();
+  if (homeScreen.instagrams.length > 4) {
+    homeScreen.instagrams.shift();
   }
-  homeScreen.insta.push(insta._id);
+  homeScreen.instagrams.push(insta._id);
   await homeScreen.save();
 
   res.status(200).json({

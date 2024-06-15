@@ -16,6 +16,8 @@ export const initHomeScreen = async () => {
     createUser: null,
     updateUser: null,
     createdAt: new Date(),
+    instagrams: [],
+    blogs: []
   });
 
   homeScreen = await homeScreen.save();

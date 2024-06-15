@@ -78,6 +78,8 @@ export const getFeature = asyncHandler(async (req, res, next) => {
 });
 
 export const createFeature = asyncHandler(async (req, res, next) => {
+  const feature = await Feature.create(req.body);
+
   if (req.body.isHomeScreen) {
     const homeScreen = await HomeScreen.findOne({});
     if (!homeScreen) {
@@ -95,7 +97,6 @@ export const createFeature = asyncHandler(async (req, res, next) => {
     homeScreen.features.push(feature._id);
     await homeScreen.save();
   }
-  const feature = await Feature.create(req.body);
 
   res.status(200).json({
     success: true,

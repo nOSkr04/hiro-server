@@ -71,6 +71,8 @@ export const createCategory = asyncHandler(async (req, res, next) => {
     req.body.name[0],
     req.body.name[0].toUpperCase()
   );
+  req.body.createUser = req.userId;
+
   const category = await Category.create(req.body);
   if (req.body.parentCategory) {
     const parentCategory = await Category.findById(req.body.parentCategory);

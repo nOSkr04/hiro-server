@@ -151,3 +151,29 @@ export const updateVariant = asyncHandler(async (req, res, next) => {
     data: variant,
   });
 });
+
+export const updateManyVariants = asyncHandler(async (req, res, next) => {
+  const variantsArray = req.body;
+  try {
+    variantsArray.map(async (item) => {
+      const ids = item.id;
+      ids.map(async (val) => {
+        const variant = await ProductVariant.findById(val);
+        if (!variant) {
+          throw new MyError(val + " ID-тэй ном байхгүй байна.", 404);
+        }
+        variant.set({
+          price: item.price,
+          quantity: item.quantity,
+        });
+        await variant.save();
+      });
+    });
+    res.status(200).json({
+      success: true,
+      data: variantsArray
+    });
+  } catch (error) {
+    next(error);
+  }
+});

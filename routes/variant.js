@@ -7,6 +7,7 @@ import {
   createVariant,
   deleteVariant,
   updateVariant,
+  updateManyVariants,
 } from "../controller/variant.js";
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router
   .get(getVariants)
   .post(protect, authorize("admin", "operator"), createVariant);
 
+router.route("/updateMany").put(protect, authorize("admin"), updateManyVariants);
 router
   .route("/:id")
   .get(getVariant)

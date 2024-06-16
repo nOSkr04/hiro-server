@@ -58,6 +58,10 @@ export const getCategory = asyncHandler(async (req, res, next) => {
       model: "Category",
       path: "parentCategory",
     },
+    {
+      model: "Image",
+      path: "icon",
+    },
   ]);
 
   if (!category) {

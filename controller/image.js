@@ -38,7 +38,7 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
       const imageUrl = `${req.protocol}://${req.get("host")}/upload/${type}/${
         file.name
       }`;
-
+      console.log("imageUrl", imageUrl);
       const newImage = await Image.create({
         name: file.name,
         type: type,

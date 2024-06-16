@@ -35,7 +35,11 @@ export const uploadClientPhoto = asyncHandler(async (req, res, next) => {
           400
         );
       }
-      const imageUrl = `${req.protocol}://${req.get("host")}/upload/${type}/${
+      // const imageUrl = `${req.protocol}://${req.get("host")}/upload/${type}/${
+      //   file.name
+      // }`;
+      console.log("req.protocol", req.protocol);
+      const imageUrl = `${req.protocol}://server.missk.mn/upload/${type}/${
         file.name
       }`;
       console.log("imageUrl", imageUrl);

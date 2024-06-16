@@ -154,11 +154,10 @@ export const updateManyVariants = asyncHandler(async (req, res, next) => {
   const variantsArray = req.body.values;
   try {
     variantsArray.map(async (item) => {
-      const ids = item.id;
-      ids.map(async (val) => {
-        const variant = await ProductVariant.findById(val);
+      const id = item._id;
+        const variant = await ProductVariant.findById(id);
         if (!variant) {
-          throw new MyError(val + " ID-тэй бараа байхгүй байна.", 404);
+          throw new MyError(id + " ID-тэй бараа байхгүй байна.", 404);
         }
         variant.set({
           price: item.price,
@@ -166,7 +165,6 @@ export const updateManyVariants = asyncHandler(async (req, res, next) => {
           availableForSale: item.quantity > 0 ? true : false,
         });
         await variant.save();
-      });
     });
     res.status(200).json({
       success: true,

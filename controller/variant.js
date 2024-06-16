@@ -1,13 +1,11 @@
-import path from "path";
 import ProductOption from "../models/ProductOption.js";
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import paginate from "../utils/paginate.js";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
-import Variant from "../models/ProductVariant.js";
 import ProductVariant from "../models/ProductVariant.js";
-// /options
+// variant v1
 
 export const getVariants = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -160,11 +158,12 @@ export const updateManyVariants = asyncHandler(async (req, res, next) => {
       ids.map(async (val) => {
         const variant = await ProductVariant.findById(val);
         if (!variant) {
-          throw new MyError(val + " ID-тэй ном байхгүй байна.", 404);
+          throw new MyError(val + " ID-тэй бараа байхгүй байна.", 404);
         }
         variant.set({
           price: item.price,
           quantity: item.quantity,
+          availableForSale: item.quantity > 0 ? true : false,
         });
         await variant.save();
       });

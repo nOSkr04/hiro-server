@@ -21,8 +21,13 @@ export const getBanners = asyncHandler(async (req, res, next) => {
   const banner = await Banner.find(req.query)
     .sort(sort)
     .skip(pagination.start - 1)
-    .limit(limit);
-
+    .limit(limit)
+    .populate([
+      {
+        model: "Image",
+        path: "image",
+      },
+    ]);
   res.status(200).json({
     success: true,
     count: banner.length,

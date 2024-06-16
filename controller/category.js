@@ -53,6 +53,7 @@ export const getCategory = asyncHandler(async (req, res, next) => {
     {
       model: "Category",
       path: "childCategories",
+      populate: [{ model: "Image", path: "icon" }],
     },
     {
       model: "Category",

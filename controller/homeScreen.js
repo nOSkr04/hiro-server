@@ -53,6 +53,10 @@ export const getHomeScreen = asyncHandler(async (req, res, next) => {
     {
       model: "Feature",
       path: "features",
+      populate: {
+        model: "Product",
+        path: "products",
+      },
     },
   ]);
 

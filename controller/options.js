@@ -30,7 +30,7 @@ export const getOptions = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page, 10) - 1 || 0;
   const limit = parseInt(req.query.limit, 10) || 10;
   const filter = req.query.filter || {};
-  if(filter.product){
+  if (filter.product) {
     filters.product = filter.product;
   }
   if (filter?.query && filter?.query !== "") {
@@ -40,7 +40,6 @@ export const getOptions = asyncHandler(async (req, res, next) => {
       },
     ];
   }
-  console.log("filters", filters);
   const options = await ProductOption.find(filters)
     .sort({ createdAt: -1 })
     .skip(page * limit)

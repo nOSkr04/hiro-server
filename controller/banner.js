@@ -71,6 +71,7 @@ export const getBanner = asyncHandler(async (req, res, next) => {
 });
 
 export const createBanner = asyncHandler(async (req, res, next) => {
+  const banner = await Banner.create(req.body);
   if (req.body.isHomeScreen) {
     const homeScreen = await HomeScreen.findOne({});
     if (!homeScreen) {
@@ -88,7 +89,6 @@ export const createBanner = asyncHandler(async (req, res, next) => {
     homeScreen.banners.push(banner._id);
     await homeScreen.save();
   }
-  const banner = await Banner.create(req.body);
 
   res.status(200).json({
     success: true,

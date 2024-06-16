@@ -82,7 +82,7 @@ var corsOptions = {
 
 // index.html-ийг public хавтас дотроос ол гэсэн тохиргоо
 app.use(express.static(path.join(process.cwd(), "public")));
-
+app.enable("trust proxy");
 // Express rate limit : Дуудалтын тоог хязгаарлана
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

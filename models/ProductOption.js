@@ -26,7 +26,10 @@ const ProductOptionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-
+    type: {
+      type: String,
+      enum: ["DRAFT", "DELETED", "ACTIVE"],
+    },
     createdAt: {
       type: Date,
       default: Date.now,

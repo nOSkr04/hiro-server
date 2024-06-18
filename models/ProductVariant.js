@@ -17,7 +17,7 @@ const ProductVariantSchema = new mongoose.Schema(
     ],
     type: {
       type: String,
-      enum: ["DEFAULT", "MANUAL"],
+      enum: ["DEFAULT", "MANUAL", "DELETED"],
     },
     image: {
       type: mongoose.Schema.ObjectId,

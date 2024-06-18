@@ -16,7 +16,7 @@ const ProductSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["NEW", "ACTIVE", "DRAFT", "ARCHIVED"],
+      enum: ["NEW", "ACTIVE", "DRAFT", "ARCHIVED","DELETED"],
       default: "NEW",
     },
     images: [

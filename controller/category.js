@@ -3,8 +3,10 @@ import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import HomeScreen from "../models/HomeScreen.js";
-
-// /products
+import Product from "../models/Product.js";
+import ProductVariant from "../models/ProductVariant.js";
+import ProductOption from "../models/ProductOption.js";
+// /category
 export const getCategories = asyncHandler(async (req, res, next) => {
   const filters = {};
 
@@ -100,6 +102,25 @@ export const createCategory = asyncHandler(async (req, res, next) => {
     data: category,
   });
 });
+export const deleteCaution = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+  if (!category) {
+    throw new MyError(req.params.id + " ID-тэй категори байхгүй байна.", 404);
+  }
+  const products = await Product.find({ category: req.params.id });
+  const productIds = products.map((product) => product._id);
+  const variants = await ProductVariant.find({ product: { $in: productIds } });
+  const options = await ProductOption.find({ product: { $in: productIds } });
+  res.status(200).json({
+    success: true,
+    data: {
+      products: products,
+      productsCount: products.length,
+      variantsCount: variants.length,
+      optionsCount: options.length,
+    },
+  });
+});
 
 export const deleteCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
@@ -116,6 +137,23 @@ export const deleteCategory = asyncHandler(async (req, res, next) => {
 
   category.remove();
 
+  const products = await Product.find({ category: req.params.id });
+  products.map(async (product) => {
+    product.category = null;
+    product.type = "DELETED";
+    await product.save();
+    const variants = await ProductVariant.find({ product: product._id });
+    variants.map(async (variant) => {
+      variant.type = "DELETED";
+      await variant.save();
+    });
+    const options = await ProductOption.find({ product: product._id });
+    options.map(async (option) => {
+      option.type = "DELETED";
+      await option.save();
+    });
+  }
+  );
   res.status(200).json({
     success: true,
     data: category,

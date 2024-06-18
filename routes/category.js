@@ -7,6 +7,7 @@ import {
   createCategory,
   deleteCategory,
   updateCategory,
+  deleteCaution
 } from "../controller/category.js";
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router
   .get(getCategories)
   .post(protect, authorize("admin", "operator"), createCategory);
 
+router.route("/deleteCaution/:id").get(deleteCaution);
 router
   .route("/:id")
   .get(getCategory)

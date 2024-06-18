@@ -25,7 +25,7 @@ function generateCombinations(arrays, prefix = []) {
 }
 
 export const getOptions = asyncHandler(async (req, res, next) => {
-  const filters = {};
+  const filters = { type: { $ne: "DELETED" }};
 
   const page = parseInt(req.query.page, 10) - 1 || 0;
   const limit = parseInt(req.query.limit, 10) || 10;

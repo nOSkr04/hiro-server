@@ -10,15 +10,13 @@ import ProductVariant from "../models/ProductVariant.js";
 export const getVariants = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 100;
-  const sort = req.query.sort;
+  const filters = {type: {$ne: "DELETED"}};
+  const sort = req.query.sort || { createdAt: -1 };
 
-  [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
-  const pagination = await paginate(page, limit, ProductVariant);
-
-  const variants = await ProductVariant.find(req.query)
-    .sort(sort)
-    .skip(pagination.start - 1)
-    .limit(limit);
+  const variants = await ProductVariant.find(filters)
+  .sort(sort)
+  .skip(page * limit)
+  .limit(limit)
 
   res.status(200).json({
     success: true,

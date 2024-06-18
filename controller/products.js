@@ -9,7 +9,7 @@ import Category from "../models/Category.js";
 
 // /products
 export const getProducts = asyncHandler(async (req, res, next) => {
-  const filters = {};
+  const filters = {type: {$ne: "DELETED"}};
   const filter = req.query.filter || {};
 
   const page = parseInt(req.query.page, 10) - 1 || 0;

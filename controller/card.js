@@ -8,23 +8,37 @@ import ProductVariant from "../models/ProductVariant.js";
 
 // card
 export const getCards = asyncHandler(async (req, res, next) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 5;
-  const sort = req.query.sort;
+  const filters = { type: { $ne: "DELETED" } };
+  const page = parseInt(req.query.page, 10) - 1 || 0;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const filter = req.query.filter || {};
 
-  [("select", "sort", "page", "limit")].forEach((el) => delete req.query[el]);
-  const pagination = await paginate(page, limit, Banner);
+  if (filter.userId) {
+    filters.user = filter.userId;
+  }
 
-  const cards = await Card.find(req.query)
-    .sort(sort)
-    .skip(pagination.start - 1)
-    .limit(limit);
+  const countDocuments = await Card.countDocuments(filters);
+  const cards = await Card.find(filters)
+    .sort({ createdAt: -1 })
+    .skip(page * limit)
+    .limit(limit)
+    .populate([
+      {
+        model: "ProductVariant",
+        path : "productVariant",
+        populate: [
+          {
+            model: "Product",
+            path : "product",
+          },
+        ]
+      },
+    ]);
 
   res.status(200).json({
     success: true,
-    count: cards.length,
+    count: countDocuments,
     data: cards,
-    pagination,
   });
 });
 

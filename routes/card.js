@@ -14,7 +14,7 @@ const router = express.Router();
 
 //"/Banners"
 router.route("/").get(getCards).post(protect, createCard);
-router.route("/me").get(getOwnCard);
+router.route("/me").get(protect, getOwnCard);
 router
   .route("/:id")
   .get(getCard)

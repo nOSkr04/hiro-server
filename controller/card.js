@@ -1,20 +1,21 @@
-import Banner from "../models/Banner.js";
 import MyError from "../utils/myError.js";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import Card from "../models/Card.js";
-import paginate from "../utils/paginate.js";
 import ProductVariant from "../models/ProductVariant.js";
 
 // card
 export const getCards = asyncHandler(async (req, res, next) => {
-  const filters = { type: { $ne: "DELETED" } };
+  const filters = { type: { $ne: "ARCHIVED" } };
   const page = parseInt(req.query.page, 10) - 1 || 0;
   const limit = parseInt(req.query.limit, 10) || 10;
   const filter = req.query.filter || {};
-
   if (filter.userId) {
-    filters.user = filter.userId;
+    const user = await User.findById(filter.userId);
+    if ( !user ) {
+      throw new MyError("Таны хайсан хэрэглэгч олдсонгүй.", 400);
+    }
+    filters.user = user
   }
 
   const countDocuments = await Card.countDocuments(filters);
@@ -52,6 +53,7 @@ export const getCard = asyncHandler(async (req, res, next) => {
 });
 
 export const getOwnCard = asyncHandler(async (req, res, next) => {
+  console.log("req.userId", req.userId);
   const card = await Card.find({ user: req.userId });
 
   res.status(200).json({

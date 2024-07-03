@@ -54,7 +54,20 @@ export const getCard = asyncHandler(async (req, res, next) => {
 
 export const getOwnCard = asyncHandler(async (req, res, next) => {
   console.log("req.userId", req.userId);
-  const card = await Card.find({ user: req.userId });
+  const card = await Card.find({ user: req.userId })
+    .sort({ createdAt: -1 })
+    .populate([
+      {
+        model: "ProductVariant",
+        path : "productVariant",
+        populate: [
+          {
+            model: "Product",
+            path : "product",
+          },
+        ]
+      },
+    ]);
 
   res.status(200).json({
     success: true,
